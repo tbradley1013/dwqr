@@ -8,6 +8,8 @@
 #' needed - e.g. if the dataset contains multiple sites and/or parameters.
 #' @param rolling_window how large should the rolling mean window be?
 #' @importFrom stats smooth.spline predict
+#'
+#' @export
 rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
   if (!"data.frame" %in% class(data)) stop("data must be a data.frame or a tibble")
 
@@ -15,10 +17,10 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
   date_name <- rlang::quo_name(date_col)
   value_col <- rlang::enquo(value_col)
   value_name <- rlang::quo_name(value_col)
-  group_cols <- rlang::quos(...)
+  group_cols <- rlang::enquos(...)
 
-  if (!rlang::is_empty(group_col)) {
-    data <- dplyr::group_by(data, !!!group_col)
+  if (!rlang::is_empty(group_cols)) {
+    data <- dplyr::group_by(data, !!!group_cols)
   }
 
   rolling_mean <- tibbletime::rollify(mean, rolling_window)

@@ -1,5 +1,13 @@
 #' classify the falling limb of chlorine trend
 #'
+#' @param data a data frame with chlorine residual results
+#' @param first_deriv unquoted column name of column containing first derivative
+#' of chlorine time series
+#' @param second_deriv unquoted column name of column containing second
+#' derivative of chlorine time series
+#' @param ... unqouted column names of any grouping columns
+#'
+#' @export
 falling_limb <- function(data, first_deriv, second_deriv, ...){
   if (!"data.frame" %in% class(data)) stop("data must be a data.frame or a tibble")
 

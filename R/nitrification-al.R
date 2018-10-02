@@ -13,7 +13,7 @@
 #' average window function when calculating the first and second derivative of
 #' the chlorine time series. Defaults to 8.
 #'
-#'
+#' @export
 nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
                              percentiles = c(.8, .5, .1), rolling_window = 8){
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl")

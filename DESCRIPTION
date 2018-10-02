@@ -19,6 +19,7 @@ Imports:
     tibbletime,
     stringr,
     rlang (>= 0.1.2),
-    tibble
+    tibble,
+    ggplot2
 Suggests: 
     roxygen2

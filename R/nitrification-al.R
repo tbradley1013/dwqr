@@ -35,7 +35,7 @@ nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P
   if (method == "FL") {
     data_classed <- data %>%
       rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
-      falling_limb(rolling_first, rolling_second, ...)
+      falling_limb(!!value_col, rolling_first, rolling_second, ...)
 
     if (!rlang::is_empty(group_cols)) {
       data_classed <- dplyr::group_by(data_classed, !!!group_cols)

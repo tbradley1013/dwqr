@@ -8,9 +8,10 @@
 #' @param ... unqouted column names of any grouping columns
 #'
 #' @export
-falling_limb <- function(data, first_deriv, second_deriv, ...){
+falling_limb <- function(data, value_col, first_deriv, second_deriv, ..., max_chlorine = 1.5){
   if (!"data.frame" %in% class(data)) stop("data must be a data.frame or a tibble")
 
+  value_col <- rlang::enquo(value_col)
   first_deriv <- rlang::enquo(first_deriv)
   second_deriv <- rlang::enquo(second_deriv)
   group_cols <- rlang::enquos(...)
@@ -23,6 +24,7 @@ falling_limb <- function(data, first_deriv, second_deriv, ...){
   output <- data %>%
     dplyr::mutate(
       falling_limb = dplyr::case_when(
+        !!value_col >= max_chlorine ~ "Other",
         !!first_deriv < 0 & !!second_deriv < 0 ~ "Falling Limb",
         !!first_deriv < 0 & !!second_deriv >= 0 ~ "Nitrification Ongoing",
         !!first_deriv >= 0 & !!second_deriv >= 0 ~ "Nitrification Ongoing",

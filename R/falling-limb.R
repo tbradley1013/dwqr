@@ -1,6 +1,8 @@
 #' classify the falling limb of chlorine trend
 #'
 #' @param data a data frame with chlorine residual results
+#' @param value_col unqouted column name of column containing the chlorine
+#' results for the time series
 #' @param first_deriv unquoted column name of column containing first derivative
 #' of chlorine time series
 #' @param second_deriv unquoted column name of column containing second

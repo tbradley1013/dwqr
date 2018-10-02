@@ -13,6 +13,20 @@ falling_limb <- function(data, first_deriv, second_deriv, ...){
 
 
   output <- data %>%
+    dplyr::mutate(
+      falling_limb = dplyr::case_when(
+        !!first_deriv < 0 & !!second_deriv < 0 ~ "Falling Limb",
+        !!first_deriv < 0 & !!second_deriv >= 0 ~ "Nitrification Ongoing",
+        !!first_deriv >= 0 & !!second_deriv >= 0 ~ "Nitrification Ongoing",
+        TRUE ~ "Other"
+      )
+    )
 
+  if (!rlang::is_empty(group_cols)) {
+    output <- dplyr::ungroup(output)
+  }
 
+  return(output)
 }
+
+

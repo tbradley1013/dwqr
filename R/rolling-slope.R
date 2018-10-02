@@ -78,6 +78,6 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
       rolling_second = rolling_mean(second_deriv_ma)
     )
 
-    return(output)
+  return(output)
 
 }

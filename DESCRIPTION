@@ -11,7 +11,7 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.0
-Imports: 
+Imports:
     magrittr,
     dplyr,
     tidyr,
@@ -20,6 +20,9 @@ Imports:
     stringr,
     rlang (>= 0.1.2),
     tibble,
-    ggplot2
-Suggests: 
+    ggplot2,
+    patchwork
+Remotes: 
+    github::thomasp85/patchwork
+Suggests:
     roxygen2

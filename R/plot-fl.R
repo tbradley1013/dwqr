@@ -14,7 +14,8 @@
 #'
 #' @export
 plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
-                    max_chlorine = 1.5){
+                    max_chlorine = 1.5, include_first = FALSE,
+                    date_breaks = "1 month", date_labels = "%B %d, %Y"){
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl")
 
   date_col <- rlang::enquo(date_col)
@@ -29,8 +30,13 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
     rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
     falling_limb(!!value_col, rolling_first, rolling_second, ..., max_chlorine = max_chlorine)
 
+  date_class <- plot_data %>%
+    dplyr::pull(!!date_col) %>%
+    head(1) %>%
+    class()
+
   p <- plot_data %>%
-    ggplot2::ggplot(aes(!!date_col, !!value_col, color = falling_limb)) +
+    ggplot2::ggplot(ggplot2::aes(!!date_col, !!value_col, color = falling_limb)) +
     ggplot2::geom_point() +
     ggplot2::theme_bw() +
     ggplot2::scale_color_brewer(name = "", palette = "Dark2")
@@ -38,6 +44,31 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
   if (!rlang::is_empty(group_cols)){
     p <- p +
       ggplot2::facet_wrap(vars(!!!group_cols))
+  }
+
+  if ("Date" %in% date_class) {
+    p <- p + scale_x_date(date_breaks = date_breaks, date_labels = date_labels)
+  } else if ("POSIXct" %in% date_class){
+    p <- p + scale_x_datetime(date_breaks = date_breaks, date_labels = date_labels)
+  }
+
+  if (include_first) {
+    p2 <- plot_data %>%
+      ggplot2::ggplot(ggplot2::aes(!!date_col)) +
+      ggplot2::geom_point(ggplot2::aes(y = first_deriv, color = "black")) +
+      ggplot2::geom_line(ggplot2::aes(y = rolling_first, color = "red"), size = 1) +
+      ggplot2::theme_bw() +
+      ggplot2::scale_color_manual(
+        values = c("black" = "black", "red" = "red"),
+        labels = c(
+          "First Derivative",
+          "Rolling Average of First Derivative"
+        )
+      ) +
+      ggplot2::theme(
+        legend.title = element_blank()
+      )
+
   }
 
   return(p)

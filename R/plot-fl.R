@@ -47,9 +47,9 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
   }
 
   if ("Date" %in% date_class) {
-    p <- p + scale_x_date(date_breaks = date_breaks, date_labels = date_labels)
+    p <- p + ggplot2::scale_x_date(date_breaks = date_breaks, date_labels = date_labels)
   } else if ("POSIXct" %in% date_class){
-    p <- p + scale_x_datetime(date_breaks = date_breaks, date_labels = date_labels)
+    p <- p + ggplot2::scale_x_datetime(date_breaks = date_breaks, date_labels = date_labels)
   }
 
   if (include_first) {
@@ -66,7 +66,7 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
         )
       ) +
       ggplot2::theme(
-        legend.title = element_blank()
+        legend.title = ggplot2::element_blank()
       )
 
   }

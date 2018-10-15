@@ -1,5 +1,10 @@
 #' Plot falling limb functions
 #'
+#' \code{plot_fl} provides methods to plot the falling limb of a
+#' chlorine residual time series plot. This function will be useful for
+#' trying to visualize how selected parameters such as \code{rolling_window}
+#' effect the grouping of data points
+#'
 #' @param data a data frame containing chlorine residual results
 #' @param date_col unqouted column name of date time column in data
 #' @param value_col unquoted column name of chlorine column in data
@@ -11,10 +16,22 @@
 #' falling limb. For example, if you are not concerned with sites when chlorine
 #' is greater than 1.5 (default) than no value greater than this threshold
 #' will be classified as either "Falling Limb" or "Nitrification Ongoing"
+#' @param date_breaks a character string to be passed to either
+#' \code{\link{ggplot2::scale_x_date}} or \code{\link{ggplot2::scale_x_datetime}}
+#' to specify the spacing of date breaks (e.g. "1 month" or "3 weeks")
+#' @param date_labels a character string specifying the desired output
+#' format of dates on x axis. See \code{\link{strptime}} for options
+#' @param ylab a character string specifying the y axis label for the main plot
+#' @param plot_title a character string specifying the title of the plot
+#' @param include_first logical; should a plot of the first derivative and
+#' its moving average be included along with the main trend?
+#' @param theme a \code{\link{ggplot2::theme}} object that can be passed to
+#' all plots
+#'
 #'
 #' @export
 plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
-                    max_chlorine = 1.5, date_breaks = "1 month", date_labels = "%b %d, %Y",
+                    max_chlorine = 1.5, date_breaks = "6 months", date_labels = "%b %d, %Y",
                     ylab = "", plot_title = "", include_first = FALSE, theme = NULL){
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl")
 

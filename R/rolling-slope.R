@@ -1,4 +1,8 @@
-#' calculate first and second derivative of chlorine trend
+#' Calculate first and second derivative of chlorine trend
+#'
+#' \code{rolling_slope} calculates the first and second derivative
+#' of a provided time series trend along with the moving average
+#' of these values
 #'
 #' @param data a dataframe or tbl that contains at the minimum a date column
 #' and a chlorine residual column

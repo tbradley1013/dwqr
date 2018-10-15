@@ -1,5 +1,9 @@
 #' classify the falling limb of chlorine trend
 #'
+#' \code{falling_limb} use the first and second derivative of a
+#' time series slope to classify portions of it as the falling limb
+#' of the curve
+#'
 #' @param data a data frame with chlorine residual results
 #' @param value_col unqouted column name of column containing the chlorine
 #' results for the time series

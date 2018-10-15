@@ -46,6 +46,10 @@
 #' their corresponding action level. If you would like to display the percentiles as
 #' column names rather than action levels, then specify **output_name = "P"**
 #'
+#' Both of these methods will struggle if samples are not collected regularly at
+#' a given location. Regular sampling allows for the overall trends to be identified
+#' and classified correctly.
+#'
 #'
 #' @export
 nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),

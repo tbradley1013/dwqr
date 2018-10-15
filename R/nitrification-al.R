@@ -1,5 +1,10 @@
 #' determine action levels for nitrification
 #'
+#' \code{nitrification_al} calculates proposed action levels for chlorine
+#' residual for nitrification control and response plans. These action
+#' levels can be calculated via the falling limb method or by plain
+#' percentiles of the overall data
+#'
 #' @param data a data frame with chlorine residual results
 #' @param date_col the unquoted column name of a date or datetime column in data
 #' @param value_col the unquoted column name of the results in data
@@ -88,14 +93,15 @@ nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P
 
     output <- data_classed %>%
       dplyr::filter(falling_limb == "Falling Limb") %>%
-      dplyr::summarize_at(vars(!!value_col), funs(!!!quants))
+      dplyr::summarize_at(dplyr::vars(!!value_col), dplyr::funs(!!!quants))
+
   } else if (method == "P") {
     if (!rlang::is_empty(group_cols)) {
       data <- dplyr::group_by(data, !!!group_cols)
     }
 
     output <- data %>%
-      dplyr::summarize_at(vars(!!value_col), funs(!!!quants))
+      dplyr::summarize_at(dplyr::vars(!!value_col), dplyr::funs(!!!quants))
 
   }
 

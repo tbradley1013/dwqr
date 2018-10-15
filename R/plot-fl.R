@@ -32,7 +32,8 @@
 #' @export
 plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
                     max_chlorine = 1.5, date_breaks = "6 months", date_labels = "%b %d, %Y",
-                    ylab = "", plot_title = "", include_first = FALSE, theme = NULL){
+                    ylab = "", plot_title = "", include_first = FALSE, theme = NULL,
+                    nitrite_col){
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl")
 
   date_col <- rlang::enquo(date_col)
@@ -117,14 +118,58 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
         theme
     }
 
-    p <- patchwork::wrap_plots(
-      p,
-      p2,
-      ncol = 1
-    )
+    # p <- patchwork::wrap_plots(
+    #   p,
+    #   p2,
+    #   ncol = 1
+    # )
 
-  }
+  } else p2 <- NULL
 
-  return(p)
+  if (!missing(nitrite_col)) {
+    nitrite_col <- rlang::enquo(nitrite_col)
+
+    p3 <- plot_data %>%
+      ggplot2::ggplot(ggplot2::aes(!!date_col)) +
+      ggplot2::geom_point(ggplot2::aes(y = !!nitrite_col)) +
+      ggplot2::theme_bw() +
+      ggplot2::labs(
+        x = "",
+        y = "Nitrite"
+      )
+
+    if (!rlang::is_empty(group_cols)){
+      p3 <- p3 +
+        ggplot2::facet_wrap(dplyr::vars(!!!group_cols))
+    }
+
+    if ("Date" %in% date_class) {
+      p3 <- p3 + ggplot2::scale_x_date(date_breaks = date_breaks, date_labels = date_labels)
+    } else if ("POSIXct" %in% date_class){
+      p3 <- p3 + ggplot2::scale_x_datetime(date_breaks = date_breaks, date_labels = date_labels)
+    }
+
+    if (!is.null(theme)) {
+      p3 <- p3 +
+        theme
+    }
+
+    # p <- patchwork::wrap_plots(
+    #   p,
+    #   p3,
+    #   ncol = 1
+    # )
+
+  } else p3 <- NULL
+
+  plot_list <- list(p, p2, p3) %>%
+    purrr::discard(is.null)
+
+  output <- patchwork::wrap_plots(
+    plot_list,
+    ncol = 1
+  )
+
+  return(output)
 
 }

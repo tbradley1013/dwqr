@@ -27,6 +27,9 @@
 #' its moving average be included along with the main trend?
 #' @param theme a \code{\link{ggplot2::theme}} object that can be passed to
 #' all plots
+#' @param nitrite_col column name (optional) of column containing nitrite
+#' data that corresponds with the chlorine data. This will be plotted
+#' alongside the chlorine data via the \code{\link{patchwork}} package
 #'
 #'
 #' @export

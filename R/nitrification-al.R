@@ -21,8 +21,10 @@
 #' falling limb. For example, if you are not concerned with sites when chlorine
 #' is greater than 1.5 (default) than no value greater than this threshold
 #' will be classified as either "Falling Limb" or "Nitrification Ongoing"
-#' @param output_name should the output column names be given as action levels (AL),
-#' i.e. Action Level 1, Action Level 2, etc., or as the percentile (P), i.e.
+#' @param output_name should the output column names be given as title
+#' action levels ("AL-C"), i.e. Action Level 1, Action Level 2, etc.,
+#' as action levels for R code ("AL"), i.e. action_level_1, etc.,
+#' or as the percentile ("P"), i.e.
 #' 80%, 50%, etc.
 #'
 #' @details
@@ -54,14 +56,14 @@
 #' @export
 nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
                              percentiles = c(.8, .5, .1), rolling_window = 8,
-                             max_chlorine = 1.5, output_name = c("AL", "P")){
+                             max_chlorine = 1.5, output_name = c("AL-C", "AL", "P")){
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl", call. = FALSE)
   req_cols <- c(missing(date_col), missing(value_col))
   if (any(req_cols)) stop("both `date_col` and `value_col` must be specified", call. = FALSE)
   # browser()
 
   method <- match.arg(method, c("FL", "P"))
-  output_name <- match.arg(output_name, c("AL", "P"))
+  output_name <- match.arg(output_name, c("AL-C", "AL", "P"))
 
   value_col <- rlang::enquo(value_col)
   date_col <- rlang::enquo(date_col)
@@ -70,8 +72,10 @@ nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P
   percentiles <- sort(percentiles, decreasing = TRUE)
 
   quant_names <- purrr::imap_chr(percentiles, ~{
-    if (output_name == "AL") {
+    if (output_name == "AL-C") {
       paste("Action Level", .y)
+    } else if (output_name == "AL") {
+      paste0("action_level_", .y)
     } else {
       paste0(.x*100, "%")
     }

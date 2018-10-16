@@ -6,7 +6,7 @@
 \usage{
 nitrification_al(data, date_col, value_col, ..., method = c("FL", "P"),
   percentiles = c(0.8, 0.5, 0.1), rolling_window = 8,
-  max_chlorine = 1.5, output_name = c("AL", "P"))
+  max_chlorine = 1.5, output_name = c("AL-C", "AL", "P"))
 }
 \arguments{
 \item{data}{a data frame with chlorine residual results}
@@ -33,8 +33,10 @@ falling limb. For example, if you are not concerned with sites when chlorine
 is greater than 1.5 (default) than no value greater than this threshold
 will be classified as either "Falling Limb" or "Nitrification Ongoing"}
 
-\item{output_name}{should the output column names be given as action levels (AL),
-i.e. Action Level 1, Action Level 2, etc., or as the percentile (P), i.e.
+\item{output_name}{should the output column names be given as title
+action levels ("AL-C"), i.e. Action Level 1, Action Level 2, etc.,
+as action levels for R code ("AL"), i.e. action_level_1, etc.,
+or as the percentile ("P"), i.e.
 80%, 50%, etc.}
 }
 \description{

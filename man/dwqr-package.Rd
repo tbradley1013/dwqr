@@ -4,9 +4,9 @@
 \name{dwqr-package}
 \alias{dwqr}
 \alias{dwqr-package}
-\title{dwqr: What the Package Does (Title Case)}
+\title{dwqr: **D**rinking **W**ater **Q**uality **R**}
 \description{
-More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+This package allows for calculation of different statistics 
+    for drinking water quality in drinking water distribution systems.
 }
 \keyword{internal}

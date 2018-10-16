@@ -7,7 +7,7 @@
 plot_fl(data, date_col, value_col, ..., rolling_window = 8,
   max_chlorine = 1.5, date_breaks = "6 months",
   date_labels = "\%b \%d, \%Y", ylab = "", plot_title = "",
-  include_first = FALSE, theme = NULL)
+  include_first = FALSE, theme = NULL, nitrite_col)
 }
 \arguments{
 \item{data}{a data frame containing chlorine residual results}
@@ -43,6 +43,10 @@ its moving average be included along with the main trend?}
 
 \item{theme}{a \code{\link{ggplot2::theme}} object that can be passed to
 all plots}
+
+\item{nitrite_col}{column name (optional) of column containing nitrite
+data that corresponds with the chlorine data. This will be plotted
+alongside the chlorine data via the \code{\link{patchwork}} package}
 }
 \description{
 \code{plot_fl} provides methods to plot the falling limb of a

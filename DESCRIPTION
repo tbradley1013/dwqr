@@ -1,11 +1,10 @@
 Package: dwqr
 Type: Package
-Title: What the Package Does (Title Case)
+Title: **D**rinking **W**ater **Q**uality **R**
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Author@R: person("Tyler", "Bradley", "tyler.bradley@phila.gov", role = c("aut", "cre")) 
+Description: This package allows for calculation of different statistics 
+    for drinking water quality in drinking water distribution systems.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

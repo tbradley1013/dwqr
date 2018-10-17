@@ -57,7 +57,31 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
 
   }
 
-
+  plot_data %>%
+    {suppressMessages(dplyr::full_join(., data_classed))} %>%
+    tidyr::fill(dplyr::contains("action_level")) %>%
+    tidyr::fill(dplyr::contains("action_level"), .direction = "up") %>%
+    dplyr::mutate(
+      level = dplyr::case_when(
+        !!value_col < action_level_3 ~ "Action Level 3",
+        !!value_col < action_level_2 ~ "Action Level 2",
+        !!value_col < action_level_1 ~ "Action Level 1",
+        TRUE ~ "No Action Required"
+      )
+    ) %>%
+    ggplot2::ggplot(ggplot2::aes(!!date_col, !!value_col, color = level)) +
+    ggplot2::geom_point() +
+    ggplot2::facet_wrap(dplyr::vars(!!!group_cols)) +
+    ggplot2::theme_bw() +
+    ggplot2::scale_color_manual(
+      values = c(
+        "No Action Required" = "black",
+        "Action Level 1" = "#ff9a00",
+        "Action Level 2" = "#ff7400",
+        "Action Level 3" = "#ff0000"
+      ),
+      name = ""
+    )
 
 
 

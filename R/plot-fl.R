@@ -68,7 +68,7 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
     ggplot2::labs(
       y = ylab,
       x = "",
-      title = plot_title
+      title = plot_title,
       subtitle = plot_subtitle
     )
 

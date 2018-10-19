@@ -7,7 +7,8 @@
 plot_fl(data, date_col, value_col, ..., rolling_window = 8,
   max_chlorine = 1.5, date_breaks = "6 months",
   date_labels = "\%b \%d, \%Y", ylab = "", plot_title = "",
-  include_first = FALSE, theme = NULL, nitrite_col)
+  plot_subtitle = "", include_first = FALSE, theme = NULL,
+  nitrite_col, nitrite_ylab = "Nitrite")
 }
 \arguments{
 \item{data}{a data frame containing chlorine residual results}
@@ -38,6 +39,8 @@ format of dates on x axis. See \code{\link{strptime}} for options}
 
 \item{plot_title}{a character string specifying the title of the plot}
 
+\item{plot_subtitle}{a chacter string specifying the subtitle of the plot}
+
 \item{include_first}{logical; should a plot of the first derivative and
 its moving average be included along with the main trend?}
 
@@ -47,6 +50,9 @@ all plots}
 \item{nitrite_col}{column name (optional) of column containing nitrite
 data that corresponds with the chlorine data. This will be plotted
 alongside the chlorine data via the \code{\link{patchwork}} package}
+
+\item{nitrite_ylab}{character string that specifies the y label for the
+nitrite graph. Only used if nitrite_col is specified}
 }
 \description{
 \code{plot_fl} provides methods to plot the falling limb of a

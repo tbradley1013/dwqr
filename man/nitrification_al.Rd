@@ -35,7 +35,7 @@ will be classified as either "Falling Limb" or "Nitrification Ongoing"}
 
 \item{output_name}{should the output column names be given as title
 action levels ("AL-C"), i.e. Action Level 1, Action Level 2, etc.,
-as action levels for R code ("AL"), i.e. action_level_1, etc.,
+as action levels better suited for R code ("AL"), i.e. action_level_1, etc.,
 or as the percentile ("P"), i.e.
 80%, 50%, etc.}
 }

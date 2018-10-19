@@ -23,6 +23,7 @@
 #' format of dates on x axis. See \code{\link{strptime}} for options
 #' @param ylab a character string specifying the y axis label for the main plot
 #' @param plot_title a character string specifying the title of the plot
+#' @param plot_subtitle a chacter string specifying the subtitle of the plot
 #' @param include_first logical; should a plot of the first derivative and
 #' its moving average be included along with the main trend?
 #' @param theme a \code{\link{ggplot2::theme}} object that can be passed to
@@ -30,13 +31,16 @@
 #' @param nitrite_col column name (optional) of column containing nitrite
 #' data that corresponds with the chlorine data. This will be plotted
 #' alongside the chlorine data via the \code{\link{patchwork}} package
+#' @param nitrite_ylab character string that specifies the y label for the
+#' nitrite graph. Only used if nitrite_col is specified
 #'
 #'
 #' @export
 plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
                     max_chlorine = 1.5, date_breaks = "6 months", date_labels = "%b %d, %Y",
-                    ylab = "", plot_title = "", include_first = FALSE, theme = NULL,
-                    nitrite_col){
+                    ylab = "", plot_title = "", plot_subtitle = "",
+                    include_first = FALSE, theme = NULL,
+                    nitrite_col, nitrite_ylab = "Nitrite"){
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl")
 
   date_col <- rlang::enquo(date_col)
@@ -65,6 +69,7 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
       y = ylab,
       x = "",
       title = plot_title
+      subtitle = plot_subtitle
     )
 
   if (!rlang::is_empty(group_cols)){
@@ -138,7 +143,7 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
       ggplot2::theme_bw() +
       ggplot2::labs(
         x = "",
-        y = "Nitrite"
+        y = nitrite_ylab
       )
 
     if (!rlang::is_empty(group_cols)){

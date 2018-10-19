@@ -2,12 +2,36 @@
 #'
 #' Generate plots showing whether an action level is exceeded
 #'
+#' @param data a data frame or tibble that has chlorine residual data
+#' @param date_col the unquoted column name of the date/datetime column
+#' @param value_col the unqouted column name of the chlorine residual column
+#' @param ... unqouted column names of all grouping columns
+#' @param method either "FL" or "P" to distinguish how you want the
+#' action levels to be calculated
+#' @param percentiles the percentiles that will be used to calculate the
+#' action levels of either the falling limb (if method = "FL") or the
+#' overall distribution (if method = "P")
+#' @param rolling_window how many observations should be included in the rolling
+#' average window function when calculating the first and second derivative of
+#' the chlorine time series. Defaults to 8.
+#' @param max_chlorine maximum chlorine residual value that can be included in
+#' falling limb. For example, if you are not concerned with sites when chlorine
+#' is greater than 1.5 (default) than no value greater than this threshold
+#' will be classified as either "Falling Limb" or "Nitrification Ongoing"
+#' @param date_breaks a character string to be passed to either
+#' \code{\link{ggplot2::scale_x_date}} or \code{\link{ggplot2::scale_x_datetime}}
+#' to specify the spacing of date breaks (e.g. "1 month" or "3 weeks")
+#' @param date_labels a character string specifying the desired output
+#' format of dates on x axis. See \code{\link{strptime}} for options
+#' @param ylab a character string specifying the y axis label for the main plot
+#' @param plot_title a character string specifying the title of the plot
+#' @param plot_subtitle a chacter string specifying the subtitle of the plot
 #'
 #' @export
 plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
                     percentiles = c(.8, .5, .1), rolling_window = 8,
                     max_chlorine = 1.5, date_breaks = "6 months", date_labels = "%b %d, %Y",
-                    ylab = "", plot_title = ""){
+                    ylab = "", plot_title = "", plot_subtitle = ""){
 
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl")
   req_cols <- c(missing(date_col), missing(value_col))
@@ -30,6 +54,7 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
     purrr::partial(quantile, probs = .x, na.rm = TRUE)
   }) %>%
     purrr::set_names(nm = quant_names)
+
 
 
   if (method == "FL") {
@@ -81,6 +106,11 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
         "Action Level 3" = "#ff0000"
       ),
       name = ""
+    ) +
+    ggplot2::labs(
+      y = ylab,
+      title = plot_title,
+      subtitle = plot_subtitle
     )
 
 

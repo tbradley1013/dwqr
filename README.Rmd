@@ -64,12 +64,10 @@ nitrification %>%
 You may notice that the argument `rolling_window` was set to 7. This argument helps to determine how many data points should be used to calculate the rolling mean of the chloramine residual and of its first and second derivative. This is done to prevent oversensitivity to slight changes in chloramine residual but to better capture trends in the data. By default, this argument is set to 8. To know how to best set `rolling_window`, you can visualize how the data is classified by using the `plot_fl` function. 
 
 ```{r plot-fl-7}
-p <- nitrification %>% 
+nitrification %>% 
   filter(site == "Site 1") %>% 
-  plot_fl(date_col = date, value_col = chlorine, rolling_window = 7) 
-
-p 
-
+  plot_fl(date_col = date, value_col = chlorine, rolling_window = 7) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 ```
 
 You can see how the classifications change when the window size is changed
@@ -77,7 +75,8 @@ You can see how the classifications change when the window size is changed
 ```{r plot-fl-12}
 nitrification %>% 
   filter(site == "Site 1") %>% 
-  plot_fl(date_col = date, value_col = chlorine, rolling_window = 12) 
+  plot_fl(date_col = date, value_col = chlorine, rolling_window = 12)  + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 
 ```
 

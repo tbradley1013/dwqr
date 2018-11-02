@@ -108,11 +108,10 @@ By default, this argument is set to 8. To know how to best set
 the `plot_fl` function.
 
 ``` r
-p <- nitrification %>% 
+nitrification %>% 
   filter(site == "Site 1") %>% 
-  plot_fl(date_col = date, value_col = chlorine, rolling_window = 7) 
-
-p 
+  plot_fl(date_col = date, value_col = chlorine, rolling_window = 7) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 ```
 
 ![](man/figures/README-plot-fl-7-1.png)<!-- -->
@@ -123,7 +122,8 @@ changed
 ``` r
 nitrification %>% 
   filter(site == "Site 1") %>% 
-  plot_fl(date_col = date, value_col = chlorine, rolling_window = 12) 
+  plot_fl(date_col = date, value_col = chlorine, rolling_window = 12)  + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 ```
 
 ![](man/figures/README-plot-fl-12-1.png)<!-- -->

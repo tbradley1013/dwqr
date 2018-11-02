@@ -5,9 +5,9 @@ output: rmarkdown::github_document
 ---
 
 ```{r setup, echo = FALSE}
-# knitr::opts_chunk$set(
-#   fig.path = "man/figures/README-"
-# )
+knitr::opts_chunk$set(
+  fig.path = "man/figures/README-"
+)
 
 ```
 

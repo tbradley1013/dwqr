@@ -115,7 +115,7 @@ p <- nitrification %>%
 p 
 ```
 
-![](README_files/figure-gfm/plot-fl-7-1.png)<!-- -->
+![](man/figures/README-plot-fl-7-1.png)<!-- -->
 
 You can see how the classifications change when the window size is
 changed
@@ -126,7 +126,7 @@ nitrification %>%
   plot_fl(date_col = date, value_col = chlorine, rolling_window = 12) 
 ```
 
-![](README_files/figure-gfm/plot-fl-12-1.png)<!-- -->
+![](man/figures/README-plot-fl-12-1.png)<!-- -->
 
 In general, datasets that have more frequent data points will benefit
 from larger rolling windows while datasets with less frequent data

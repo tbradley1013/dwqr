@@ -51,7 +51,7 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
   date_col <- rlang::enquo(date_col)
   group_cols <- rlang::enquos(...)
 
-  date_class <- plot_data %>%
+  date_class <- data %>%
     dplyr::pull(!!date_col) %>%
     head(1) %>%
     class()
@@ -135,7 +135,8 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
 
       plot_data <- data_classed %>%
         dplyr::filter(falling_limb == "Falling Limb") %>%
-        dplyr::mutate_at(dplyr::vars(!!value_col), dplyr::funs(!!!quants))
+        dplyr::mutate_at(dplyr::vars(!!value_col), dplyr::funs(!!!quants)) %>%
+        {suppressMessages(dplyr::full_join(., data_classed))}
 
     } else if (method == "P") {
       if (!rlang::is_empty(group_cols)) {
@@ -148,7 +149,6 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
     }
 
     p <- plot_data %>%
-      {suppressMessages(dplyr::full_join(., data_classed))} %>%
       tidyr::fill(dplyr::contains("action_level")) %>%
       tidyr::fill(dplyr::contains("action_level"), .direction = "up") %>%
       dplyr::mutate(

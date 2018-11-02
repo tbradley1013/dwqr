@@ -190,3 +190,11 @@ nitrification %>%
     )
   )
 ```
+
+
+
+---
+
+### A quick note of tidy eval
+
+This packages uses [tidy eval](https://dplyr.tidyverse.org/articles/programming.html) via the [`rlang`](https://github.com/r-lib/rlang) package. This is why the column names of the `date_col` and `value_col` are passed to the nitrification functions as unquoted variable names rather than strings. This is also what allows for the grouping variables to be set dynamically by the user. It is important to keep this in mind as you use this package as passing a quoted column name will result in an error. 

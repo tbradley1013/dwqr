@@ -33,13 +33,15 @@
 #' will be sorted with the lowest number by default being the highest action level
 #' and the highest number given being the lowest action level. The number of action
 #' levels in the resulting data will be equal to the number of action levels given
+#' @param ncol,nrow If grouping variable is specified, these arguments set the
+#' number of columns and rows, respectively of the resultant facetted plot
 #'
 #' @export
 plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
                     percentiles = c(.8, .5, .1), rolling_window = 8,
                     max_chlorine = 1.5, date_breaks = "6 months", date_labels = "%b %d, %Y",
                     ylab = "", plot_title = "", plot_subtitle = "", legend_title = "",
-                    action_levels = NULL, theme = NULL){
+                    action_levels = NULL, theme = NULL, ncol = NULL, nrow = NULL){
 
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl")
   req_cols <- c(missing(date_col), missing(value_col))
@@ -104,7 +106,8 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
       )
 
     if (!rlang::is_empty(group_cols)) {
-      p <- p + ggplot2::facet_wrap(dplyr::vars(!!!group_cols))
+      p <- p + ggplot2::facet_wrap(dplyr::vars(!!!group_cols),
+                                   ncol = ncol, nrow = nrow)
     }
 
     if ("Date" %in% date_class) {
@@ -178,7 +181,8 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
       )
 
     if (!rlang::is_empty(group_cols)) {
-      p <- p + ggplot2::facet_wrap(dplyr::vars(!!!group_cols))
+      p <- p + ggplot2::facet_wrap(dplyr::vars(!!!group_cols),
+                                   ncol = ncol, nrow = nrow)
     }
 
     if ("Date" %in% date_class) {

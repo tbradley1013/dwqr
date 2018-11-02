@@ -33,6 +33,8 @@
 #' alongside the chlorine data via the \code{\link{patchwork}} package
 #' @param nitrite_ylab character string that specifies the y label for the
 #' nitrite graph. Only used if nitrite_col is specified
+#' @param ncol,nrow If grouping variable is specified, these arguments set the
+#' number of columns and rows, respectively of the resultant facetted plot
 #'
 #'
 #' @export
@@ -40,7 +42,8 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
                     max_chlorine = 1.5, date_breaks = "6 months", date_labels = "%b %d, %Y",
                     ylab = "", plot_title = "", plot_subtitle = "",
                     include_first = FALSE, theme = NULL,
-                    nitrite_col, nitrite_ylab = "Nitrite"){
+                    nitrite_col, nitrite_ylab = "Nitrite",
+                    ncol = NULL, nrow = NULL){
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl")
 
   date_col <- rlang::enquo(date_col)
@@ -74,7 +77,8 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
 
   if (!rlang::is_empty(group_cols)){
     p <- p +
-      ggplot2::facet_wrap(dplyr::vars(!!!group_cols))
+      ggplot2::facet_wrap(dplyr::vars(!!!group_cols),
+                          ncol = ncol, nrow = nrow)
   }
 
   if ("Date" %in% date_class) {
@@ -112,7 +116,8 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
 
     if (!rlang::is_empty(group_cols)){
       p2 <- p2 +
-        ggplot2::facet_wrap(dplyr::vars(!!!group_cols))
+        ggplot2::facet_wrap(dplyr::vars(!!!group_cols),
+                            ncol = ncol, nrow = nrow)
     }
 
     if ("Date" %in% date_class) {
@@ -148,7 +153,8 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
 
     if (!rlang::is_empty(group_cols)){
       p3 <- p3 +
-        ggplot2::facet_wrap(dplyr::vars(!!!group_cols))
+        ggplot2::facet_wrap(dplyr::vars(!!!group_cols),
+                            ncol = ncol, nrow = nrow)
     }
 
     if ("Date" %in% date_class) {

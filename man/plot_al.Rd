@@ -8,7 +8,8 @@ plot_al(data, date_col, value_col, ..., method = c("FL", "P"),
   percentiles = c(0.8, 0.5, 0.1), rolling_window = 8,
   max_chlorine = 1.5, date_breaks = "6 months",
   date_labels = "\%b \%d, \%Y", ylab = "", plot_title = "",
-  plot_subtitle = "", legend_title = "", action_levels = NULL)
+  plot_subtitle = "", legend_title = "", action_levels = NULL,
+  theme = NULL, ncol = NULL, nrow = NULL)
 }
 \arguments{
 \item{data}{a data frame or tibble that has chlorine residual data}
@@ -56,6 +57,9 @@ provided in the method arguement. If this argument is given, then the vector
 will be sorted with the lowest number by default being the highest action level
 and the highest number given being the lowest action level. The number of action
 levels in the resulting data will be equal to the number of action levels given}
+
+\item{ncol, nrow}{If grouping variable is specified, these arguments set the
+number of columns and rows, respectively of the resultant facetted plot}
 }
 \description{
 Generate plots showing whether an action level is exceeded

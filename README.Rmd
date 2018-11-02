@@ -6,7 +6,9 @@ output: rmarkdown::github_document
 
 ```{r setup, echo = FALSE}
 knitr::opts_chunk$set(
-  fig.path = "man/figures/README-"
+  fig.path = "man/figures/README-",
+  fig.width = 8,
+  fig.height = 5
 )
 
 ```
@@ -66,7 +68,8 @@ You may notice that the argument `rolling_window` was set to 7. This argument he
 ```{r plot-fl-7}
 nitrification %>% 
   filter(site == "Site 1") %>% 
-  plot_fl(date_col = date, value_col = chlorine, rolling_window = 7) + 
+  plot_fl(date_col = date, value_col = chlorine, rolling_window = 7,
+          ylab = "Total Chlorine Residual (mg/L)") + 
   theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 ```
 
@@ -75,10 +78,115 @@ You can see how the classifications change when the window size is changed
 ```{r plot-fl-12}
 nitrification %>% 
   filter(site == "Site 1") %>% 
-  plot_fl(date_col = date, value_col = chlorine, rolling_window = 12)  + 
+  plot_fl(date_col = date, value_col = chlorine, rolling_window = 12, 
+          ylab = "Total Chlorine Residual (mg/L)",)  + 
   theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 
 ```
 
 
-In general, datasets that have more frequent data points will benefit from larger rolling windows while datasets with less frequent data points will benefit from smaller windows
+In general, datasets that have more frequent data points will benefit from larger rolling windows while datasets with less frequent data points will benefit from smaller windows. 
+
+You can assess how well these action levels categorize a given dataset by using the `plot_al` function. 
+
+```{r plot-al-falling-limb}
+nitrification %>% 
+  filter(site == "Site 1") %>% 
+  plot_al(date_col = date, value_col = chlorine, 
+          ylab = "Total Chlorine Residual (mg/L)", rolling_window = 7) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+
+```
+
+
+### General Percentiles
+
+The second method that can be used to create action levels is general percentiles. In this case, rather than taking percentiles of a subset of the data (as in the falling limb mehtod), percentiles are taken of the overall data. By default, the percentiles selected are the same as the ones used in the falling limb method (80%, 50%, and 10%). 
+
+This option is done by setting `method = "P"`.
+
+```{r al-percentiles}
+nitrification %>% 
+  filter(site == "Site 1") %>% 
+  nitrification_al(date_col = date, value_col = chlorine, method = "P",
+                   ylab = "Total Chlorine Residual (mg/L)",)
+```
+
+Similar to the falling lumb method, you can plot the classification of data points to see how well these action levels classify the data by using the `plot_al` function. 
+
+```{r plot-al-percentiles}
+nitrification %>% 
+  filter(site == "Site 1") %>% 
+  plot_al(date_col = date, value_col = chlorine, method = "P",
+          ylab = "Total Chlorine Residual (mg/L)") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+
+```
+
+
+
+### Mutliple Sites
+
+`dwqr`'s nitrification functions allow for multiple sites to be passed to them so that site specific action levels can be generated. This is done by passing all grouping columns as unnmaed arguments after the `date_col` and `value_col` columns. In the case of our `nitrification` dataset, this would be the `site` column. You may have noticed that I was using a `filter` statement in the code above to only include data for "Site 1". Now let's try the same thing as before but set the `site` column as a grouping variable. 
+
+```{r al-grouped}
+nitrification %>% 
+  nitrification_al(date_col = date, value_col = chlorine, site)
+
+```
+
+As we can see, there is now action levels generated for each of the sites in the data set! If a grouping variable is passed to one of the plotting functions, the groups are separated by `facet_wrap` in the `ggplot2` package. 
+
+
+```{r plot-fl-grouped}
+nitrification %>% 
+  plot_fl(date_col = date, value_col = chlorine, site,
+          ylab = "Total Chlorine Residual (mg/L)",
+          ncol = 1) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+
+```
+
+
+### Plotting the first derivative and nitrite
+
+The `plot_fl` function also allowd for users to plot the first derivative of the chlorine trend (a key component in the calculation of the falling limb) and any associated nitrite data. In order to include the first derivative plot, you simply must set `include_first = TRUE`. 
+
+```{r fl-first-deriv}
+nitrification %>% 
+  filter(site == "Site 1") %>% 
+  plot_fl(
+    date_col = date, value_col = chlorine, 
+    rolling_window = 7, include_first = TRUE,
+    ylab = "Total Chlorine Residual (mg/L)",
+    theme = theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
+    )
+  )
+
+```
+
+**NOTE:** In this past plot, the `theme` argument was used inside of `plot_fl`. When either the first derivative or nitrite plots are included with your falling limb plot, you must specify all ggplot2 theme elements with the `theme` argument. This will apply your desired themes to all of the plots. Otherwise, it will only apply it to the last plot. 
+
+
+To plot nitrite data with the falling limb classification, the nitrite data must be in a separate column with corresponding sample points lined up. You can use the `nitrification` data set as an example. 
+
+```{r nitrification-data}
+nitrification
+```
+
+Plotting the two together would look like this. 
+
+```{r fl-with-nitrite}
+nitrification %>% 
+  filter(site == "Site 1") %>% 
+  plot_fl(
+    date_col = date, value_col = chlorine, 
+    rolling_window = 7, nitrite_col = nitrite,
+    ylab = "Total Chlorine Residual (mg/L)",
+    nitrite_ylab = "Nitrite (mg N/L)",
+    theme = theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
+    )
+  )
+```

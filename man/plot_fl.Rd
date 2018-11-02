@@ -8,7 +8,7 @@ plot_fl(data, date_col, value_col, ..., rolling_window = 8,
   max_chlorine = 1.5, date_breaks = "6 months",
   date_labels = "\%b \%d, \%Y", ylab = "", plot_title = "",
   plot_subtitle = "", include_first = FALSE, theme = NULL,
-  nitrite_col, nitrite_ylab = "Nitrite")
+  nitrite_col, nitrite_ylab = "Nitrite", ncol = NULL, nrow = NULL)
 }
 \arguments{
 \item{data}{a data frame containing chlorine residual results}
@@ -53,6 +53,9 @@ alongside the chlorine data via the \code{\link{patchwork}} package}
 
 \item{nitrite_ylab}{character string that specifies the y label for the
 nitrite graph. Only used if nitrite_col is specified}
+
+\item{ncol, nrow}{If grouping variable is specified, these arguments set the
+number of columns and rows, respectively of the resultant facetted plot}
 }
 \description{
 \code{plot_fl} provides methods to plot the falling limb of a

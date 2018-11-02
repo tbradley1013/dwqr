@@ -25,7 +25,8 @@
 #' format of dates on x axis. See \code{\link{strptime}} for options
 #' @param ylab a character string specifying the y axis label for the main plot
 #' @param plot_title a character string specifying the title of the plot
-#' @param plot_subtitle a chacter string specifying the subtitle of the plot
+#' @param plot_subtitle a character string specifying the subtitle of the plot
+#' @param legend_title a character string specifying the legend title
 #' @param action_levels a numeric vector specifying action levels. If this is
 #' NULL (default) than the action levels will be specified via the method
 #' provided in the method arguement. If this argument is given, then the vector
@@ -98,7 +99,7 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
       )
 
     if (!rlang::is_empty(group_cols)) {
-      p <- p + ggplot2::facet_wrap(dplyr::vars(!!!group_vars))
+      p <- p + ggplot2::facet_wrap(dplyr::vars(!!!group_cols))
     }
 
     return(p)
@@ -161,7 +162,7 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
       )
 
     if (!rlang::is_empty(group_cols)) {
-      p <- p + ggplot2::facet_wrap(dplyr::vars(!!!group_vars))
+      p <- p + ggplot2::facet_wrap(dplyr::vars(!!!group_cols))
     }
 
     return(p)

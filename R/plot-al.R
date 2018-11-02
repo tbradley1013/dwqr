@@ -37,16 +37,14 @@
 plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
                     percentiles = c(.8, .5, .1), rolling_window = 8,
                     max_chlorine = 1.5, date_breaks = "6 months", date_labels = "%b %d, %Y",
-                    ylab = "", plot_title = "", plot_subtitle = "",
+                    ylab = "", plot_title = "", plot_subtitle = "", legend_title = "",
                     action_levels = NULL){
 
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl")
   req_cols <- c(missing(date_col), missing(value_col))
   if (any(req_cols)) stop("both `date_col` and `value_col` must be specified", call. = FALSE)
-  # browser()
 
   method <- match.arg(method, c("FL", "P"))
-  # output_name <- match.arg(output_name, c("AL-C", "AL", "P"))
 
   value_col <- rlang::enquo(value_col)
   date_col <- rlang::enquo(date_col)
@@ -68,18 +66,20 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
 
     action_levels <- sort(action_levels, decreasing = TRUE)
 
-    names(action_levels) <- paste0("action_level", 1:length(action_levels))
+    names(action_levels) <- paste("Action Level", 1:length(action_levels))
 
     action_levels <- sort(action_levels)
 
+
     p <- data %>%
+      dplyr::filter(!is.na(!!value_col)) %>%
       dplyr::mutate(
         level = purrr::map_chr(!!value_col, function(y){
           output <- purrr::map(action_levels, ~{
             if (y < .x) return(.x)
           }) %>%
             purrr::flatten() %>%
-            .[. == min(purrr::flatten_dbl(.))] %>%
+            .[. == suppressWarnings(min(purrr::flatten_dbl(.)))] %>%
             names()
 
           if (is.null(output)){
@@ -89,22 +89,17 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
       ) %>%
       ggplot2::ggplot(ggplot2::aes(!!date_col, !!value_col, color = level)) +
       ggplot2::geom_point() +
-      ggplot2::facet_wrap(dplyr::vars(!!!group_vars)) +
       ggplot2::theme_bw() +
-      ggplot2::scale_color_manual(
-        values = c(
-          "No Action Required" = "black",
-          "Action Level 1" = "#ff9a00",
-          "Action Level 2" = "#ff7400",
-          "Action Level 3" = "#ff0000"
-        ),
-        name = ""
-      ) +
       ggplot2::labs(
         y = ylab,
         title = plot_title,
-        subtitle = plot_subtitle
+        subtitle = plot_subtitle,
+        color = legend_title
       )
+
+    if (!rlang::is_empty(group_cols)) {
+      p <- p + ggplot2::facet_wrap(dplyr::vars(!!!group_vars))
+    }
 
     return(p)
 
@@ -149,7 +144,6 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
       ) %>%
       ggplot2::ggplot(ggplot2::aes(!!date_col, !!value_col, color = level)) +
       ggplot2::geom_point() +
-      ggplot2::facet_wrap(dplyr::vars(!!!group_cols)) +
       ggplot2::theme_bw() +
       ggplot2::scale_color_manual(
         values = c(
@@ -158,7 +152,7 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
           "Action Level 2" = "#ff7400",
           "Action Level 3" = "#ff0000"
         ),
-        name = ""
+        name = legend_title
       ) +
       ggplot2::labs(
         y = ylab,
@@ -166,13 +160,12 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
         subtitle = plot_subtitle
       )
 
+    if (!rlang::is_empty(group_cols)) {
+      p <- p + ggplot2::facet_wrap(dplyr::vars(!!!group_vars))
+    }
+
     return(p)
   }
-
-
-
-
-
 
 
 

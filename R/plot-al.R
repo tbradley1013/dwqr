@@ -39,7 +39,7 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
                     percentiles = c(.8, .5, .1), rolling_window = 8,
                     max_chlorine = 1.5, date_breaks = "6 months", date_labels = "%b %d, %Y",
                     ylab = "", plot_title = "", plot_subtitle = "", legend_title = "",
-                    action_levels = NULL){
+                    action_levels = NULL, theme = NULL){
 
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl")
   req_cols <- c(missing(date_col), missing(value_col))
@@ -50,6 +50,11 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
   value_col <- rlang::enquo(value_col)
   date_col <- rlang::enquo(date_col)
   group_cols <- rlang::enquos(...)
+
+  date_class <- plot_data %>%
+    dplyr::pull(!!date_col) %>%
+    head(1) %>%
+    class()
 
   percentiles <- sort(percentiles, decreasing = TRUE)
 
@@ -100,6 +105,17 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
 
     if (!rlang::is_empty(group_cols)) {
       p <- p + ggplot2::facet_wrap(dplyr::vars(!!!group_cols))
+    }
+
+    if ("Date" %in% date_class) {
+      p <- p + ggplot2::scale_x_date(date_breaks = date_breaks, date_labels = date_labels)
+    } else if ("POSIXct" %in% date_class){
+      p <- p + ggplot2::scale_x_datetime(date_breaks = date_breaks, date_labels = date_labels)
+    }
+
+    if (!is.null(theme)) {
+      p <- p +
+        theme
     }
 
     return(p)
@@ -163,6 +179,17 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
 
     if (!rlang::is_empty(group_cols)) {
       p <- p + ggplot2::facet_wrap(dplyr::vars(!!!group_cols))
+    }
+
+    if ("Date" %in% date_class) {
+      p <- p + ggplot2::scale_x_date(date_breaks = date_breaks, date_labels = date_labels)
+    } else if ("POSIXct" %in% date_class){
+      p <- p + ggplot2::scale_x_datetime(date_breaks = date_breaks, date_labels = date_labels)
+    }
+
+    if (!is.null(theme)) {
+      p <- p +
+        theme
     }
 
     return(p)

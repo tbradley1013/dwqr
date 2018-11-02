@@ -40,7 +40,7 @@ library(tidyverse)
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
-## Nitrification
+## Nitrification Action Levels
 
 Nitrification is a common problem for many utilites that use chloramines
 as a secondary disinfectant. As chloramines decay, free ammonia is

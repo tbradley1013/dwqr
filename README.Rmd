@@ -41,7 +41,7 @@ library(dwqr)
 library(tidyverse)
 ```
 
-## Nitrification
+## Nitrification Action Levels
 
 Nitrification is a common problem for many utilites that use chloramines as a secondary disinfectant. As chloramines decay, free ammonia is released. This free ammonia acts as food for ammonia and nitrite oxidizing bacteria (AOB and NOB, respectively). As the population of AOB and NOB increase, the problem is exacerbated causing chloramine to decay faster, releasing more free ammonia. The increased decay of chloramines is a major issue for water utilities as disinfectant is the main prevention of harmful bacteria from entering the water system. As a result, utitlies must establish strategies for dealing with nitrification in their distribution systems. In some states, such a Pennsylvania, regulators require a set action plan to be created in the form of a nitrification control plan. AWWA provides recommendations for dealing with nitrification and creating in their [M56 Manual: Nitrification Prevention and Control in Drinking Water]. One of the major aspects of a nitrification control is determing necessary operational responses to different levels of potential nitrification. 
 

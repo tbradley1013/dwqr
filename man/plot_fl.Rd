@@ -6,9 +6,11 @@
 \usage{
 plot_fl(data, date_col, value_col, ..., rolling_window = 8,
   max_chlorine = 1.5, date_breaks = "6 months",
-  date_labels = "\%b \%d, \%Y", ylab = "", plot_title = "",
-  plot_subtitle = "", include_first = FALSE, theme = NULL,
-  nitrite_col, nitrite_ylab = "Nitrite", ncol = NULL, nrow = NULL)
+  date_labels = "\%b \%d, \%Y", ylab = "", ylim = NULL,
+  plot_title = "", plot_subtitle = "", include_first = FALSE,
+  first_ylim = NULL, theme = NULL, nitrite_col,
+  nitrite_ylab = "Nitrite", nitrite_ylim = NULL, ncol = NULL,
+  nrow = NULL)
 }
 \arguments{
 \item{data}{a data frame containing chlorine residual results}
@@ -37,12 +39,18 @@ format of dates on x axis. See \code{\link{strptime}} for options}
 
 \item{ylab}{a character string specifying the y axis label for the main plot}
 
+\item{ylim}{a vector of length two specifying the limits of the y axis for the
+chlorine plot. If NULL (default) default ggplot2 limits will be used}
+
 \item{plot_title}{a character string specifying the title of the plot}
 
 \item{plot_subtitle}{a chacter string specifying the subtitle of the plot}
 
 \item{include_first}{logical; should a plot of the first derivative and
 its moving average be included along with the main trend?}
+
+\item{first_ylim}{a vector of length two specifying the limits of the y axis for the
+first derivative of chlorine plot. If NULL (default) default ggplot2 limits will be used}
 
 \item{theme}{a \code{\link{ggplot2::theme}} object that can be passed to
 all plots}
@@ -53,6 +61,9 @@ alongside the chlorine data via the \code{\link{patchwork}} package}
 
 \item{nitrite_ylab}{character string that specifies the y label for the
 nitrite graph. Only used if nitrite_col is specified}
+
+\item{nitrite_ylim}{a vector of length two specifying the limits of the y axis for the
+nitrite plot. If NULL (default) default ggplot2 limits will be used}
 
 \item{ncol, nrow}{If grouping variable is specified, these arguments set the
 number of columns and rows, respectively of the resultant facetted plot}

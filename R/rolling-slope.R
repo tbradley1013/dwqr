@@ -29,10 +29,17 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
 
   rolling_mean <- tibbletime::rollify(mean, rolling_window)
 
-  output <- data %>%
+  data <- data %>%
     dplyr::filter(!is.na(!!value_col),
-                  !is.na(!!date_col)) %>%
-    tidyr::nest() %>%
+                  !is.na(!!date_col))
+
+
+  if (length(group_cols) == 0){
+    data <- tidyr::nest(data, data = dplyr::everything())
+  }
+
+  output <- data %>%
+    # tidyr::nest() %>%
     dplyr::mutate(
       spline = purrr::map(.data$data, ~smooth.spline(.x[[ !!date_name ]], .x[[ !!value_name ]])),
       first_deriv = purrr::map2(.data$spline, .data$data, ~{
@@ -76,6 +83,7 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
         }
       )
     ) %>%
+    dplyr::select(data_new) %>%
     tidyr::unnest(data_new) %>%
     dplyr::mutate(
       rolling_first = rolling_mean(first_deriv_ma),

@@ -22,10 +22,14 @@
 #' @param date_labels a character string specifying the desired output
 #' format of dates on x axis. See \code{\link{strptime}} for options
 #' @param ylab a character string specifying the y axis label for the main plot
+#' @param ylim a vector of length two specifying the limits of the y axis for the
+#' chlorine plot. If NULL (default) default ggplot2 limits will be used
 #' @param plot_title a character string specifying the title of the plot
 #' @param plot_subtitle a chacter string specifying the subtitle of the plot
 #' @param include_first logical; should a plot of the first derivative and
 #' its moving average be included along with the main trend?
+#' @param first_ylim a vector of length two specifying the limits of the y axis for the
+#' first derivative of chlorine plot. If NULL (default) default ggplot2 limits will be used
 #' @param theme a \code{\link{ggplot2::theme}} object that can be passed to
 #' all plots
 #' @param nitrite_col column name (optional) of column containing nitrite
@@ -33,6 +37,8 @@
 #' alongside the chlorine data via the \code{\link{patchwork}} package
 #' @param nitrite_ylab character string that specifies the y label for the
 #' nitrite graph. Only used if nitrite_col is specified
+#' @param nitrite_ylim a vector of length two specifying the limits of the y axis for the
+#' nitrite plot. If NULL (default) default ggplot2 limits will be used
 #' @param ncol,nrow If grouping variable is specified, these arguments set the
 #' number of columns and rows, respectively of the resultant facetted plot
 #'
@@ -40,9 +46,10 @@
 #' @export
 plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
                     max_chlorine = 1.5, date_breaks = "6 months", date_labels = "%b %d, %Y",
-                    ylab = "", plot_title = "", plot_subtitle = "",
-                    include_first = FALSE, theme = NULL,
+                    ylab = "", ylim = NULL, plot_title = "", plot_subtitle = "",
+                    include_first = FALSE, first_ylim = NULL, theme = NULL,
                     nitrite_col, nitrite_ylab = "Nitrite",
+                    nitrite_ylim = NULL,
                     ncol = NULL, nrow = NULL){
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl")
 
@@ -87,6 +94,10 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
     p <- p + ggplot2::scale_x_datetime(date_breaks = date_breaks, date_labels = date_labels)
   }
 
+  if (!is.null(ylim)) {
+    p <- p + ggplot2::scale_y_continuous(limits = ylim)
+  }
+
   if (!is.null(theme)) {
     p <- p +
       theme
@@ -126,6 +137,10 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
       p2 <- p2 + ggplot2::scale_x_datetime(date_breaks = date_breaks, date_labels = date_labels)
     }
 
+    if (!is.null(first_ylim)){
+      p2 <- p2 + ggplot2::scale_y_continuous(limits = first_ylim)
+    }
+
     if (!is.null(theme)) {
       p2 <- p2 +
         theme
@@ -161,6 +176,10 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
       p3 <- p3 + ggplot2::scale_x_date(date_breaks = date_breaks, date_labels = date_labels)
     } else if ("POSIXct" %in% date_class){
       p3 <- p3 + ggplot2::scale_x_datetime(date_breaks = date_breaks, date_labels = date_labels)
+    }
+
+    if (!is.null(nitrite_ylim)){
+      p3 <- p3 + ggplot2::scale_y_continuous(limits = nitrite_ylim)
     }
 
     if (!is.null(theme)) {

@@ -25,4 +25,4 @@ Remotes:
     github::thomasp85/patchwork
 Suggests:
     roxygen2,
-    testthat
+    testthat (>= 2.1.0)

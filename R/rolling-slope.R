@@ -10,7 +10,8 @@
 #' @param value_col the unquoted name of the chlorine residual column
 #' @param ... the unqouted names of all grouping columns, if grouping is
 #' needed - e.g. if the dataset contains multiple sites and/or parameters.
-#' @param rolling_window how large should the rolling mean window be?
+#' @param rolling_window how large should the rolling mean window be? Specifies
+#' the number of weeks worth of data to include in rolling mean calculations
 #' @importFrom stats smooth.spline predict
 #'
 #' @export

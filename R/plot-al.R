@@ -11,7 +11,7 @@
 #' @param percentiles the percentiles that will be used to calculate the
 #' action levels of either the falling limb (if method = "FL") or the
 #' overall distribution (if method = "P")
-#' @param rolling_window how many observations should be included in the rolling
+#' @param rolling_window how many weeks of data should be included in the rolling
 #' average window function when calculating the first and second derivative of
 #' the chlorine time series. Defaults to 8.
 #' @param max_chlorine maximum chlorine residual value that can be included in

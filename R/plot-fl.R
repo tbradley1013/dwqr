@@ -9,7 +9,7 @@
 #' @param date_col unqouted column name of date time column in data
 #' @param value_col unquoted column name of chlorine column in data
 #' @param ... unqouted column name(s) of grouping variable(s)
-#' @param rolling_window how many observations should be included in the rolling
+#' @param rolling_window how many weeks of data should be included in the rolling
 #' average window function when calculating the first and second derivative of
 #' the chlorine time series. Defaults to 8.
 #' @param max_chlorine maximum chlorine residual value that can be included in

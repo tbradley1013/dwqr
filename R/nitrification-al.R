@@ -14,7 +14,7 @@
 #' either on the overall data ("P" method) or on the falling limb portion of
 #' the dataset ("FL" method). By default, 0.8, 0.5, and 0.1 are used for action
 #' levels 1, 2, and 3, respectively
-#' @param rolling_window how many observations should be included in the rolling
+#' @param rolling_window how many weeks of data should be included in the rolling
 #' average window function when calculating the first and second derivative of
 #' the chlorine time series. Defaults to 8.
 #' @param max_chlorine maximum chlorine residual value that can be included in

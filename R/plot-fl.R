@@ -63,7 +63,7 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
 
   plot_data <- data %>%
     rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
-    falling_limb(!!value_col, rolling_first, rolling_second, ..., max_chlorine = max_chlorine)
+    falling_limb(!!value_col, first_deriv_ma, second_deriv_ma, ..., max_chlorine = max_chlorine)
 
   date_class <- plot_data %>%
     dplyr::pull(!!date_col) %>%

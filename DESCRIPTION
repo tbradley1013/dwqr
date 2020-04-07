@@ -20,7 +20,8 @@ Imports:
     tibble,
     ggplot2,
     patchwork,
-    slider
+    slider,
+    lubridate
 Remotes: 
     github::thomasp85/patchwork
 Suggests:

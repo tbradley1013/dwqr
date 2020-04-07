@@ -34,7 +34,7 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
 
   data <- data %>%
     dplyr::mutate(
-      roll_mean = rolling_mean(!!value_col, rolling_window),
+      roll_mean = rolling_mean(!!value_col, !!date_col, rolling_window),
       date_numeric = as.numeric(!!date_col)
     ) %>%
     dplyr::filter(!is.na(roll_mean))
@@ -74,11 +74,11 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
         }
       )
     ) %>%
-    dplyr::select(data) %>%
+    dplyr::select(!!!group_cols, data) %>%
     tidyr::unnest(data) %>%
     dplyr::mutate(
-      rolling_first = rolling_mean(first_deriv_ma, rolling_window),
-      rolling_second = rolling_mean(second_deriv_ma, rolling_window)
+      rolling_first = rolling_mean(first_deriv_ma, !!date_col, rolling_window),
+      rolling_second = rolling_mean(second_deriv_ma, !!date_col, rolling_window)
     )
 
   return(output)
@@ -86,6 +86,7 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
 }
 
 
-rolling_mean <- function(value, window){
-  slider::slide_dbl(.x = value, .f = mean, .before = window, na.rm = TRUE)
+rolling_mean <- function(value, date_col, window){
+  # slider::slide_dbl(.x = value, .f = mean, .before = window, na.rm = TRUE)
+  slider::slide_index_dbl(.x = value, .i = date_col, .f = mean, .before = lubridate::weeks(window), na.rm = TRUE)
 }

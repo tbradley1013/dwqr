@@ -12,10 +12,14 @@
 #' needed - e.g. if the dataset contains multiple sites and/or parameters.
 #' @param rolling_window how large should the rolling mean window be? Specifies
 #' the number of weeks worth of data to include in rolling mean calculations
+#' @param deriv_window how many weeks of data should be included in the rolling
+#' average window for the derivatives. If NULL (default) the value given to
+#' rolling_window will be used. This argument will be ignored unless
+#' smooth_deriv = TRUE.
 #' @importFrom stats smooth.spline predict
 #'
 #' @export
-rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
+rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8, deriv_window = NULL){
   if (!"data.frame" %in% class(data)) stop("data must be a data.frame or a tibble")
 
   date_col <- rlang::enquo(date_col)
@@ -23,6 +27,8 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
   value_col <- rlang::enquo(value_col)
   value_name <- rlang::quo_name(value_col)
   group_cols <- rlang::enquos(...)
+
+  if (is.null(deriv_window)) deriv_window <- rolling_window
 
   if (!rlang::is_empty(group_cols)) {
     data <- dplyr::group_by(data, !!!group_cols)
@@ -78,8 +84,8 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
     dplyr::select(!!!group_cols, data) %>%
     tidyr::unnest(data) %>%
     dplyr::mutate(
-      rolling_first = rolling_mean(first_deriv_ma, !!date_col, rolling_window),
-      rolling_second = rolling_mean(second_deriv_ma, !!date_col, rolling_window)
+      rolling_first = rolling_mean(first_deriv_ma, !!date_col, deriv_window),
+      rolling_second = rolling_mean(second_deriv_ma, !!date_col, deriv_window)
     )
 
   return(output)

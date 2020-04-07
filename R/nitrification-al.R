@@ -17,6 +17,14 @@
 #' @param rolling_window how many weeks of data should be included in the rolling
 #' average window function when calculating the first and second derivative of
 #' the chlorine time series. Defaults to 8.
+#' @param smooth_deriv logical; should the first and second derivative values be
+#' smoothed usin a rolling average? Defaults to FALSE. Setting this to true may
+#' result in cleaner classification but may result in significatn short term
+#' trends being ignored.
+#' @param deriv_window how many weeks of data should be included in the rolling
+#' average window for the derivatives. If NULL (default) the value given to
+#' rolling_window will be used. This argument will be ignored unless
+#' smooth_deriv = TRUE.
 #' @param max_chlorine maximum chlorine residual value that can be included in
 #' falling limb. For example, if you are not concerned with sites when chlorine
 #' is greater than 1.5 (default) than no value greater than this threshold
@@ -56,6 +64,7 @@
 #' @export
 nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
                              percentiles = c(.8, .5, .1), rolling_window = 8,
+                             smooth_deriv = FALSE, deriv_window = NULL,
                              max_chlorine = 1.5, output_name = c("AL-C", "AL", "P")){
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl", call. = FALSE)
   req_cols <- c(missing(date_col), missing(value_col))
@@ -89,9 +98,16 @@ nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P
 
 
   if (method == "FL") {
-    data_classed <- data %>%
-      rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
-      falling_limb(!!value_col, first_deriv_ma, second_deriv_ma, ..., max_chlorine = max_chlorine)
+    if (smooth_deriv){
+      data_classed <- data %>%
+        rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window, deriv_window = deriv_window) %>%
+        falling_limb(!!value_col, rolling_first, rolling_second, ..., max_chlorine = max_chlorine)
+    } else {
+      data_classed <- data %>%
+        rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
+        falling_limb(!!value_col, first_deriv_ma, second_deriv_ma, ..., max_chlorine = max_chlorine)
+    }
+
 
     if (!rlang::is_empty(group_cols)) {
       data_classed <- dplyr::group_by(data_classed, !!!group_cols)

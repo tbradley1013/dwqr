@@ -106,5 +106,5 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
 
 
 rolling_mean <- function(value, window){
-  slider::slide_dbl(.x = value, .f = mean, na.rm = TRUE)
+  slider::slide_dbl(.x = value, .f = mean, .before = window, na.rm = TRUE)
 }

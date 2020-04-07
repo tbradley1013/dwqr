@@ -27,9 +27,6 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
     data <- dplyr::group_by(data, !!!group_cols)
   }
 
-  # browser()
-  # rolling_mean <- tibbletime::rollify(mean, rolling_window)
-
   data <- data %>%
     dplyr::filter(!is.na(!!value_col),
                   !is.na(!!date_col))
@@ -49,23 +46,7 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
   }
 
   output <- data %>%
-    # tidyr::nest() %>%
     dplyr::mutate(
-      # spline = purrr::map(.data$data, ~smooth.spline(.x[[ !!date_name ]], .x[[ !!value_name ]])),
-      # first_deriv = purrr::map2(.data$spline, .data$data, ~{
-      #   predict(.x, as.numeric(.y[[ !!date_name ]]), deriv = 1) %>%
-      #     tibble::as_tibble()
-      # }),
-      # data_new = purrr::map2(.data$data, .data$first_deriv, ~{
-      #   .x %>%
-      #     dplyr::mutate(date_numeric = as.numeric(!!date_col)) %>%
-      #     dplyr::left_join(.y, by = c("date_numeric" = "x")) %>%
-      #     dplyr::rename(first_deriv = y) %>%
-      #     dplyr::mutate(
-      #       roll_mean = rolling_mean(!!value_col)
-      #     ) %>%
-      #     dplyr::filter(!is.na(roll_mean))
-      # }),
       spline_ma = purrr::map(.data$data, ~smooth.spline(.x[[ !!date_name ]], .x$roll_mean)),
       first_deriv_ma = purrr::map2(.data$spline_ma, .data$data, ~{
         predict(.x, .y$date_numeric, deriv = 1) %>%

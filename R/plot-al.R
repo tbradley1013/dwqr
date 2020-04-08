@@ -29,12 +29,12 @@
 #' @param legend_title a character string specifying the legend title
 #' @param action_levels a numeric vector specifying action levels. If this is
 #' NULL (default) than the action levels will be specified via the method
-#' provided in the method arguement. If this argument is given, then the vector
+#' provided in the method argument. If this argument is given, then the vector
 #' will be sorted with the lowest number by default being the highest action level
 #' and the highest number given being the lowest action level. The number of action
 #' levels in the resulting data will be equal to the number of action levels given
 #' @param ncol,nrow If grouping variable is specified, these arguments set the
-#' number of columns and rows, respectively of the resultant facetted plot
+#' number of columns and rows, respectively of the resultant faceted plot
 #'
 #' @export
 plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),

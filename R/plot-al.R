@@ -39,6 +39,7 @@
 #' @export
 plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
                     percentiles = c(.8, .5, .1), rolling_window = 8,
+                    smooth_deriv = FALSE, deriv_window = NULL,
                     max_chlorine = 1.5, date_breaks = "6 months", date_labels = "%b %d, %Y",
                     ylab = "", plot_title = "", plot_subtitle = "", legend_title = "",
                     action_levels = NULL, theme = NULL, ncol = NULL, nrow = NULL){
@@ -124,11 +125,11 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
     return(p)
 
   } else {
-
+    browser()
     if (method == "FL") {
-      data_classed <- data %>%
-        rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
-        falling_limb(!!value_col, first_deriv_ma, second_deriv_ma, ..., max_chlorine = max_chlorine)
+      data_classed <- label_fl(data, !!date_col, !!value_col, ..., rolling_window = rolling_window,
+                               smooth_deriv = smooth_deriv, deriv_window = deriv_window,
+                               max_chlorine = max_chlorine)
 
       if (!rlang::is_empty(group_cols)) {
         data_classed <- dplyr::group_by(data_classed, !!!group_cols)

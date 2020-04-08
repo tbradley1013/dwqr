@@ -45,7 +45,8 @@
 #'
 #' @export
 plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
-                    max_chlorine = 1.5, date_breaks = "6 months", date_labels = "%b %d, %Y",
+                    max_chlorine = 1.5, smooth_deriv = FALSE, deriv_window = NULL,
+                    date_breaks = "6 months", date_labels = "%b %d, %Y",
                     ylab = "", ylim = NULL, plot_title = "", plot_subtitle = "",
                     include_first = FALSE, first_ylim = NULL, theme = NULL,
                     nitrite_col, nitrite_ylab = "Nitrite",
@@ -61,9 +62,11 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
     data <- dplyr::group_by(data, !!!group_cols)
   }
 
-  plot_data <- data %>%
-    rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
-    falling_limb(!!value_col, first_deriv_ma, second_deriv_ma, ..., max_chlorine = max_chlorine)
+  plot_data <- label_fl(data, !!date_col, !!value_col, ..., rolling_window = rolling_window,
+                        smooth_deriv = smooth_deriv, deriv_window = deriv_window,
+                        max_chlorine = max_chlorine)
+
+
 
   date_class <- plot_data %>%
     dplyr::pull(!!date_col) %>%

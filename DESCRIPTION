@@ -21,9 +21,8 @@ Imports:
     ggplot2,
     patchwork,
     slider,
-    lubridate
-Remotes: 
-    github::thomasp85/patchwork
+    lubridate,
+    patchwork
 Suggests:
     roxygen2,
     testthat (>= 2.1.0)

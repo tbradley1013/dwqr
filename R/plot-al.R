@@ -126,29 +126,50 @@ plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
 
   } else {
     browser()
-    if (method == "FL") {
-      data_classed <- label_fl(data, !!date_col, !!value_col, ..., rolling_window = rolling_window,
-                               smooth_deriv = smooth_deriv, deriv_window = deriv_window,
-                               max_chlorine = max_chlorine)
+    # if (method == "FL") {
+    #   data_classed <- label_fl(data, !!date_col, !!value_col, ..., rolling_window = rolling_window,
+    #                            smooth_deriv = smooth_deriv, deriv_window = deriv_window,
+    #                            max_chlorine = max_chlorine)
+    #
+    #   if (!rlang::is_empty(group_cols)) {
+    #     data_classed <- dplyr::group_by(data_classed, !!!group_cols)
+    #   }
+    #
+    #
+    #
+    #   plot_data <- data_classed %>%
+    #     dplyr::filter(falling_limb == "Falling Limb") %>%
+    #     dplyr::mutate_at(dplyr::vars(!!value_col), dplyr::funs(!!!quants)) %>%
+    #     {suppressMessages(dplyr::full_join(., data_classed))}
+    #
+    # } else if (method == "P") {
+    #   if (!rlang::is_empty(group_cols)) {
+    #     data <- dplyr::group_by(data, !!!group_cols)
+    #   }
+    #
+    #   plot_data <- data %>%
+    #     dplyr::mutate_at(dplyr::vars(!!value_col), dplyr::funs(!!!quants))
+    #
+    # }
 
-      if (!rlang::is_empty(group_cols)) {
-        data_classed <- dplyr::group_by(data_classed, !!!group_cols)
+    al <- nitrification_al(data, !!date_col, !!value_col, ..., method = method,
+                           percentiles = percentiles, rolling_window = rolling_window,
+                           smooth_deriv = smooth_deriv, deriv_window = deriv_window,
+                           max_chlorine = max_chlorine)
+
+    if (rlang::is_empty(group_cols)){
+      al_cols <- colnames(al)
+
+      plot_data <- data
+      for (i in seq_along(al_cols)){
+        plot_data[[al_cols[i]]] <- al[[al_cols[i]]]
       }
 
-
-
-      plot_data <- data_classed %>%
-        dplyr::filter(falling_limb == "Falling Limb") %>%
-        dplyr::mutate_at(dplyr::vars(!!value_col), dplyr::funs(!!!quants)) %>%
-        {suppressMessages(dplyr::full_join(., data_classed))}
-
-    } else if (method == "P") {
-      if (!rlang::is_empty(group_cols)) {
-        data <- dplyr::group_by(data, !!!group_cols)
-      }
+    } else {
+      group_names <- purrr::map_chr(group_cols, dplyr::quo_name)
 
       plot_data <- data %>%
-        dplyr::mutate_at(dplyr::vars(!!value_col), dplyr::funs(!!!quants))
+        dplyr::left_join(al, by = group_names)
 
     }
 

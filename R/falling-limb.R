@@ -51,3 +51,22 @@ falling_limb <- function(data, value_col, first_deriv, second_deriv, ..., max_ch
 }
 
 
+label_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
+                     smooth_deriv = FALSE, deriv_window = NULL,
+                     max_chlorine = 1.5){
+  date_col <- dplyr::enquo(date_col)
+  value_col <- dplyr::enquo(value_col)
+
+  if (smooth_deriv){
+    data_classed <- data %>%
+      rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window, deriv_window = deriv_window) %>%
+      falling_limb(!!value_col, rolling_first, rolling_second, ..., max_chlorine = max_chlorine)
+  } else {
+    data_classed <- data %>%
+      rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
+      falling_limb(!!value_col, first_deriv_ma, second_deriv_ma, ..., max_chlorine = max_chlorine)
+  }
+
+}
+
+

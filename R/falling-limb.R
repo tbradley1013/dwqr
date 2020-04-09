@@ -67,6 +67,8 @@ label_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
       falling_limb(!!value_col, first_deriv_ma, second_deriv_ma, ..., max_chlorine = max_chlorine)
   }
 
+  return(data_classed)
+
 }
 
 

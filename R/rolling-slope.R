@@ -42,24 +42,11 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
         predict(.x, as.numeric(.y[[ !!date_name ]]), deriv = 1) %>%
           tibble::as_tibble()
       }),
-      # data_new = purrr::map2(.data$data, .data$first_deriv, ~{
-      #   .x %>%
-      #     dplyr::mutate(date_numeric = as.numeric(!!date_col)) %>%
-      #     dplyr::left_join(.y, by = c("date_numeric" = "x")) %>%
-      #     dplyr::rename(first_deriv = y) %>%
-      #     dplyr::mutate(
-      #       roll_mean = rolling_mean(!!value_col)
-      #     ) %>%
-      #     dplyr::filter(!is.na(roll_mean))
-      # }),
       spline_ma = purrr::map(.data$data, ~smooth.spline(.x[[ !!date_name ]], .x$roll_mean)),
       first_deriv_ma = purrr::map2(.data$spline_ma, .data$data, ~{
         predict(.x, .y$date_numeric, deriv = 1) %>%
           tibble::as_tibble()
       }),
-      # deriv_spline_ma = purrr::map2(.data$first_deriv_ma, .data$data_new, ~{
-      #   smooth.spline(.y[[ !!date_name ]], .x$y)
-      # }),
       second_deriv_ma = purrr::map2(.data$spline_ma, .data$data, ~{
         predict(.x, .y$date_numeric, deriv = 2) %>%
           tibble::as_tibble()
@@ -71,11 +58,14 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
           .data$second_deriv_ma
         ),
         .f = ~{
-          ..1 %>%
-            dplyr::left_join(..2, by = c("date_numeric" = "x")) %>%
-            dplyr::rename(first_deriv_ma = y) %>%
-            dplyr::left_join(..3, by = c("date_numeric" = "x")) %>%
-            dplyr::rename(second_deriv_ma = y)
+
+          out <- dplyr::bind_cols(
+            ..1,
+            dplyr::select(..2, first_deriv_ma = y),
+            dplyr::select(..3, second_deriv_ma = y)
+          )
+
+          return(out)
         }
       )
     ) %>%

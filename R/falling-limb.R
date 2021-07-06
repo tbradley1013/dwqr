@@ -19,7 +19,7 @@
 #'
 #'
 #' @export
-falling_limb <- function(data, value_col, first_deriv, second_deriv, ..., max_chlorine = 1.5){
+falling_limb <- function(data, value_col, first_deriv, second_deriv, ...){
   if (!"data.frame" %in% class(data)) stop("data must be a data.frame or a tibble")
 
   value_col <- rlang::enquo(value_col)
@@ -35,12 +35,9 @@ falling_limb <- function(data, value_col, first_deriv, second_deriv, ..., max_ch
   output <- data %>%
     dplyr::mutate(
       falling_limb = dplyr::case_when(
-        !!value_col >= max_chlorine ~ "Other",
-        !!first_deriv < 0 & !!second_deriv < 0 ~ "Falling Limb",
-        !!first_deriv < 0 & !!second_deriv >= 0 ~ "Nitrification Ongoing",
-        !!first_deriv >= 0 & !!second_deriv >= 0 ~ "Nitrification Ongoing",
+        !!first_deriv < 0 & lag(!!first_deriv) < 0 ~ "Falling Limb",
         TRUE ~ "Other"
-      )
+      ),
     )
 
   if (!rlang::is_empty(group_cols)) {
@@ -51,3 +48,11 @@ falling_limb <- function(data, value_col, first_deriv, second_deriv, ..., max_ch
 }
 
 
+fl_class_hmm <- function(x){
+
+}
+
+
+fl_class_manual <- function(x){
+
+}

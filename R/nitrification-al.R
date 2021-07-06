@@ -55,7 +55,7 @@
 #'
 #' @export
 nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
-                             percentiles = c(.8, .5, .1), rolling_window = 8,
+                             percentiles = c(.8, .5, .2), rolling_window = 8,
                              max_chlorine = 1.5, output_name = c("AL-C", "AL", "P")){
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl", call. = FALSE)
   req_cols <- c(missing(date_col), missing(value_col))
@@ -91,7 +91,7 @@ nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P
   if (method == "FL") {
     data_classed <- data %>%
       rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
-      falling_limb(!!value_col, rolling_first, rolling_second, ..., max_chlorine = max_chlorine)
+      falling_limb(!!value_col, first_deriv_ma, second_deriv_ma, ...)
 
     if (!rlang::is_empty(group_cols)) {
       data_classed <- dplyr::group_by(data_classed, !!!group_cols)
@@ -100,8 +100,8 @@ nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P
 
 
     output <- data_classed %>%
-      dplyr::filter(falling_limb == "Falling Limb") %>%
-      dplyr::summarize_at(dplyr::vars(!!value_col), dplyr::funs(!!!quants))
+      dplyr::filter(falling_limb == "Falling Limb", !!value_col < max_chlorine) %>%
+      dplyr::summarize_at(dplyr::vars(!!value_col), quants)
 
   } else if (method == "P") {
     if (!rlang::is_empty(group_cols)) {
@@ -109,7 +109,7 @@ nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P
     }
 
     output <- data %>%
-      dplyr::summarize_at(dplyr::vars(!!value_col), dplyr::funs(!!!quants))
+      dplyr::summarize_at(dplyr::vars(!!value_col), quants)
 
   }
 

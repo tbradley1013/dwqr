@@ -20,7 +20,8 @@ Imports:
     rlang (>= 0.1.2),
     tibble,
     ggplot2,
-    patchwork
+    patchwork,
+    depmixS4
 Remotes: 
     github::thomasp85/patchwork
 Suggests:

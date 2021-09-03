@@ -21,7 +21,8 @@ Imports:
     tibble,
     ggplot2,
     patchwork,
-    depmixS4
+    depmixS4,
+    strucchange
 Remotes: 
     github::thomasp85/patchwork
 Suggests:

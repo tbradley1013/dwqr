@@ -19,7 +19,7 @@
 #'
 #'
 #' @export
-falling_limb <- function(data, method = c("simple", "hmm"), value_col, first_deriv, second_deriv, ...){
+falling_limb <- function(data, method = c("simple", "hmm", "cp"), value_col, first_deriv, second_deriv, ...){
   if (!"data.frame" %in% class(data)) stop("data must be a data.frame or a tibble")
 
   value_col <- rlang::enquo(value_col)
@@ -31,6 +31,8 @@ falling_limb <- function(data, method = c("simple", "hmm"), value_col, first_der
     out <- fl_class_simple(data, value_col = !!value_col, first_deriv = !!first_deriv, second_deriv = !!second_deriv, ...)
   } else if (method == "hmm"){
     out <- fl_class_hmm(data, value_col = !!value_col, first_deriv = !!first_deriv, second_deriv = !!second_deriv, ...)
+  } else if (method == "cp"){
+    out <- fl_class_cp(data, value_col = !!value_col, first_deriv = !!first_deriv, second_deriv = !!second_deriv, ...)
   }
 
   return(out)
@@ -141,4 +143,73 @@ fl_class_simple <- function(data, value_col, first_deriv, second_deriv, ...){
   }
 
   return(output)
+}
+
+
+fl_class_cp <- function(data, value_col, first_deriv, second_deriv, ...){
+  value_col <- rlang::enquo(value_col)
+  first_deriv <- rlang::enquo(first_deriv)
+  second_deriv <- rlang::enquo(second_deriv)
+  group_cols <- rlang::enquos(...)
+
+  if (!rlang::is_empty(group_cols)) {
+    data <- dplyr::group_nest(data, !!!group_cols)
+
+    out <- data %>%
+      dplyr::mutate(
+        data = purrr::map(data, ~{
+          .x <- .x %>%
+            dplyr::mutate(x = !!first_deriv)
+
+          bps <- strucchange::breakpoints(.x$x ~ 1, breaks = 5)
+
+          bp_tbl <- tibble(
+            bp = c(1, bps$breakpoints),
+            bp_num = seq_along(c(1, bps$breakpoints))
+          )
+
+          out <- .x %>%
+            dplyr::mutate(row = dplyr::row_number()) %>%
+            dplyr::left_join(
+              bp_tbl, by = c("row" = "bp")
+            ) %>%
+            tidyr::fill(bp_num, .direction = "down") %>%
+            dplyr::group_by(bp_num) %>%
+            dplyr::mutate(bp_group_median = median(x, na.rm = TRUE)) %>%
+            dplyr::ungroup() %>%
+            dplyr::mutate(falling_limb = ifelse(bp_group_median < 0, "Falling Limb", "Other")) %>%
+            dplyr::select(-c(x, row, bp_num, bp_group_median))
+
+          return(out)
+        })
+      ) %>%
+      tidyr::unnest(data)
+  } else {
+    data <- data %>%
+      dplyr::mutate(x = !!first_deriv)
+
+    bps <- strucchange::breakpoints(data$x ~ 1, breaks = 5)
+
+    bp_tbl <- tibble(
+      bp = c(1, bps$breakpoints),
+      bp_num = seq_along(c(1, bps$breakpoints))
+    )
+
+    out <- data %>%
+      dplyr::mutate(row = dplyr::row_number()) %>%
+      dplyr::left_join(
+        bp_tbl, by = c("row" = "bp")
+      ) %>%
+      tidyr::fill(bp_num, .direction = "down") %>%
+      dplyr::group_by(bp_num) %>%
+      dplyr::mutate(bp_group_median = median(x, na.rm = TRUE)) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(falling_limb = ifelse(bp_group_median < 0, "Falling Limb", "Other")) %>%
+      dplyr::select(-c(x, row, bp_num, bp_group_median))
+  }
+
+
+
+  return(out)
+
 }

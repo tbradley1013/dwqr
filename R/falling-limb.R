@@ -11,13 +11,7 @@
 #' results for the time series
 #' @param first_deriv unquoted column name of column containing first derivative
 #' of chlorine time series
-#' @param second_deriv unquoted column name of column containing second
-#' derivative of chlorine time series
 #' @param ... unqouted column names of any grouping columns
-#' @param max_chlorine maximum chlorine residual value that can be included in
-#' falling limb. For example, if you are not concerned with sites when chlorine
-#' is greater than 1.5 (default) than no value greater than this threshold
-#' will be classified as either "Falling Limb" or "Nitrification Ongoing"
 #'
 #' @details
 #' the method argument must be set to one of the following:

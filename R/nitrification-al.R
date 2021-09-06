@@ -28,15 +28,16 @@
 #' 80%, 50%, etc.
 #'
 #' @details
-#' There are two methods provided for calculating nitrification action levels:
-#'
-#' FL - *Falling Limb* - This method uses the falling limb method to identify
-#' the downward trend experienced by chlorine values as temperatures rise. Before
-#' percentiles are caluclated, the falling limb portion of the graph is isolated
-#' and only this portion is used in the percentile calculations
-#'
-#' P - *Percentiles* - This method simply takes the percentiles given on the
-#' entire dataset to find the action levels.
+#' The method argument must be set to one of the following:
+#' - "simple" - A simple classification method that classifies any negative
+#' first derivative value as a part of the falling limb. Taking the first
+#' derivative of the moving average of the chlorine values is likely to reduce
+#' false classification rates when this model type is selected
+#' - "hmm" - This method uses the depmixS4 package to fit a hidden markov model
+#' using the time trend of the first derivative of the total chlorine trend
+#' - "cp" - This method uses the strucchange package to identify change points
+#' in the first derivative trned and classify values based on median first derivative
+#' values between change points
 #'
 #' By default, there are three percentiles calculated (80%, 50%, 10%) corresponding
 #' to three distinct action levels (80% - Action Level 1, 50% - Action Level 2,
@@ -54,7 +55,7 @@
 #'
 #'
 #' @export
-nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
+nitrification_al <- function(data, date_col, value_col, ..., method = c("simple", "hmm", "cp"),
                              percentiles = c(.8, .5, .2), rolling_window = 8,
                              max_chlorine = 1.5, output_name = c("AL-C", "AL", "P")){
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl", call. = FALSE)
@@ -62,7 +63,7 @@ nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P
   if (any(req_cols)) stop("both `date_col` and `value_col` must be specified", call. = FALSE)
   # browser()
 
-  method <- match.arg(method, c("FL", "P"))
+  method <- match.arg(method, c("simple", "hmm", "cp"))
   output_name <- match.arg(output_name, c("AL-C", "AL", "P"))
 
   value_col <- rlang::enquo(value_col)
@@ -87,31 +88,17 @@ nitrification_al <- function(data, date_col, value_col, ..., method = c("FL", "P
   }) %>%
     purrr::set_names(nm = quant_names)
 
+  data_classed <- data %>%
+    rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
+    falling_limb(!!value_col, method = method, first_deriv_ma, ...)
 
-  if (method == "FL") {
-    data_classed <- data %>%
-      rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
-      falling_limb(!!value_col, first_deriv_ma, second_deriv_ma, ...)
-
-    if (!rlang::is_empty(group_cols)) {
-      data_classed <- dplyr::group_by(data_classed, !!!group_cols)
-    }
-
-
-
-    output <- data_classed %>%
-      dplyr::filter(falling_limb == "Falling Limb", !!value_col < max_chlorine) %>%
-      dplyr::summarize_at(dplyr::vars(!!value_col), quants)
-
-  } else if (method == "P") {
-    if (!rlang::is_empty(group_cols)) {
-      data <- dplyr::group_by(data, !!!group_cols)
-    }
-
-    output <- data %>%
-      dplyr::summarize_at(dplyr::vars(!!value_col), quants)
-
+  if (!rlang::is_empty(group_cols)) {
+    data_classed <- dplyr::group_by(data_classed, !!!group_cols)
   }
+
+  output <- data_classed %>%
+    dplyr::filter(falling_limb == "Falling Limb", !!value_col < max_chlorine) %>%
+    dplyr::summarize_at(dplyr::vars(!!value_col), quants)
 
   return(output)
 }

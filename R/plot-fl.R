@@ -9,7 +9,7 @@
 #' @param date_col unqouted column name of date time column in data
 #' @param value_col unquoted column name of chlorine column in data
 #' @param ... unqouted column name(s) of grouping variable(s)
-#' @param rolling_window how many observations should be included in the rolling
+#' @param rolling_window how many weeks of data should be included in the rolling
 #' average window function when calculating the first and second derivative of
 #' the chlorine time series. Defaults to 8.
 #' @param max_chlorine maximum chlorine residual value that can be included in
@@ -45,7 +45,8 @@
 #'
 #' @export
 plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
-                    max_chlorine = 1.5, date_breaks = "6 months", date_labels = "%b %d, %Y",
+                    max_chlorine = 1.5, smooth_deriv = FALSE, deriv_window = NULL,
+                    date_breaks = "6 months", date_labels = "%b %d, %Y",
                     ylab = "", ylim = NULL, plot_title = "", plot_subtitle = "",
                     include_first = FALSE, first_ylim = NULL, theme = NULL,
                     nitrite_col, nitrite_ylab = "Nitrite",
@@ -61,9 +62,11 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
     data <- dplyr::group_by(data, !!!group_cols)
   }
 
-  plot_data <- data %>%
-    rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
-    falling_limb(!!value_col, rolling_first, rolling_second, ..., max_chlorine = max_chlorine)
+  plot_data <- label_fl(data, !!date_col, !!value_col, ..., rolling_window = rolling_window,
+                        smooth_deriv = smooth_deriv, deriv_window = deriv_window,
+                        max_chlorine = max_chlorine)
+
+
 
   date_class <- plot_data %>%
     dplyr::pull(!!date_col) %>%
@@ -106,7 +109,7 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
   if (include_first) {
     p2 <- plot_data %>%
       ggplot2::ggplot(ggplot2::aes(!!date_col)) +
-      ggplot2::geom_point(ggplot2::aes(y = first_deriv, color = "black")) +
+      ggplot2::geom_point(ggplot2::aes(y = first_deriv_ma, color = "black")) +
       ggplot2::geom_line(ggplot2::aes(y = rolling_first, color = "red"), size = 1) +
       ggplot2::geom_hline(ggplot2::aes(yintercept = 0), color = "black", linetype = "dashed") +
       ggplot2::theme_bw() +

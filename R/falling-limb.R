@@ -218,3 +218,4 @@ fl_class_cp <- function(data, value_col, first_deriv, ...){
   return(out)
 
 }
+

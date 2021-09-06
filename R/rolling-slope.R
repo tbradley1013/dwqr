@@ -10,11 +10,16 @@
 #' @param value_col the unquoted name of the chlorine residual column
 #' @param ... the unqouted names of all grouping columns, if grouping is
 #' needed - e.g. if the dataset contains multiple sites and/or parameters.
-#' @param rolling_window how large should the rolling mean window be?
+#' @param rolling_window how large should the rolling mean window be? Specifies
+#' the number of weeks worth of data to include in rolling mean calculations
+#' @param deriv_window how many weeks of data should be included in the rolling
+#' average window for the derivatives. If NULL (default) the value given to
+#' rolling_window will be used. This argument will be ignored unless
+#' smooth_deriv = TRUE.
 #' @importFrom stats smooth.spline predict
 #'
 #' @export
-rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
+rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8, deriv_window = NULL){
   if (!"data.frame" %in% class(data)) stop("data must be a data.frame or a tibble")
 
   date_col <- rlang::enquo(date_col)
@@ -23,9 +28,12 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
   value_name <- rlang::quo_name(value_col)
   group_cols <- rlang::enquos(...)
 
+  if (is.null(deriv_window)) deriv_window <- rolling_window
+
   if (!rlang::is_empty(group_cols)) {
     data <- dplyr::group_by(data, !!!group_cols)
   }
+
 
   output <- data %>%
     dplyr::filter(!is.na(!!value_col),
@@ -49,9 +57,10 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
       }),
       second_deriv_ma = purrr::map2(.data$spline_ma, .data$data, ~{
         predict(.x, .y$date_numeric, deriv = 2) %>%
+
           tibble::as_tibble()
       }),
-      data_new = purrr::pmap(
+      data = purrr::pmap(
         .l = list(
           .data$data,
           .data$first_deriv_ma,
@@ -78,4 +87,10 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
 
   return(output)
 
+}
+
+
+rolling_mean <- function(value, date_col, window){
+  # slider::slide_dbl(.x = value, .f = mean, .before = window, na.rm = TRUE)
+  slider::slide_index_dbl(.x = value, .i = date_col, .f = mean, .before = lubridate::weeks(window), na.rm = TRUE)
 }

@@ -15,15 +15,18 @@ Imports:
     dplyr,
     tidyr,
     purrr,
-    tibbletime,
     stringr,
     rlang (>= 0.1.2),
     tibble,
     ggplot2,
+    slider,
+    lubridate,
     patchwork,
     depmixS4,
-    strucchange
+    strucchange,
+    zoo
 Remotes: 
     github::thomasp85/patchwork
 Suggests:
-    roxygen2
+    roxygen2,
+    testthat (>= 2.1.0)

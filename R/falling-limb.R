@@ -5,6 +5,8 @@
 #' of the curve
 #'
 #' @param data a data frame with chlorine residual results
+#' @param method the method used to classify the falling limb of the chlorine
+#' curve. See Details.
 #' @param value_col unqouted column name of column containing the chlorine
 #' results for the time series
 #' @param first_deriv unquoted column name of column containing first derivative
@@ -17,29 +19,40 @@
 #' is greater than 1.5 (default) than no value greater than this threshold
 #' will be classified as either "Falling Limb" or "Nitrification Ongoing"
 #'
+#' @details
+#' the method argument must be set to one of the following:
+#' - "simple" - A simple classification method that classifies any negative
+#' first derivative value as a part of the falling limb. Taking the first
+#' derivative of the moving average of the chlorine values is likely to reduce
+#' false classification rates when this model type is selected
+#' - "hmm" - This method uses the depmixS4 package to fit a hidden markov model
+#' using the time trend of the first derivative of the total chlorine trend
+#' - "cp" - This method uses the strucchange package to identify change points
+#' in the first derivative trned and classify values based on median first derivative
+#' values between changepoints
+#'
 #'
 #' @export
-falling_limb <- function(data, method = c("simple", "hmm", "cp"), value_col, first_deriv, second_deriv, ...){
+falling_limb <- function(data, method = c("simple", "hmm", "cp"), value_col, first_deriv, ...){
   if (!"data.frame" %in% class(data)) stop("data must be a data.frame or a tibble")
 
   value_col <- rlang::enquo(value_col)
   first_deriv <- rlang::enquo(first_deriv)
-  second_deriv <- rlang::enquo(second_deriv)
   group_cols <- rlang::enquos(...)
 
   if (method == "simple"){
-    out <- fl_class_simple(data, value_col = !!value_col, first_deriv = !!first_deriv, second_deriv = !!second_deriv, ...)
+    out <- fl_class_simple(data, value_col = !!value_col, first_deriv = !!first_deriv, ...)
   } else if (method == "hmm"){
-    out <- fl_class_hmm(data, value_col = !!value_col, first_deriv = !!first_deriv, second_deriv = !!second_deriv, ...)
+    out <- fl_class_hmm(data, value_col = !!value_col, first_deriv = !!first_deriv, ...)
   } else if (method == "cp"){
-    out <- fl_class_cp(data, value_col = !!value_col, first_deriv = !!first_deriv, second_deriv = !!second_deriv, ...)
+    out <- fl_class_cp(data, value_col = !!value_col, first_deriv = !!first_deriv, ...)
   }
 
   return(out)
 }
 
 
-fl_class_hmm <- function(data, value_col, first_deriv, second_deriv, ...){
+fl_class_hmm <- function(data, value_col, first_deriv, ...){
   first_deriv <- rlang::enquo(first_deriv)
   group_cols <- rlang::enquos(...)
 
@@ -119,10 +132,9 @@ fl_class_hmm <- function(data, value_col, first_deriv, second_deriv, ...){
 }
 
 
-fl_class_simple <- function(data, value_col, first_deriv, second_deriv, ...){
+fl_class_simple <- function(data, value_col, first_deriv, ...){
   value_col <- rlang::enquo(value_col)
   first_deriv <- rlang::enquo(first_deriv)
-  second_deriv <- rlang::enquo(second_deriv)
   group_cols <- rlang::enquos(...)
 
   if (!rlang::is_empty(group_cols)) {
@@ -146,10 +158,9 @@ fl_class_simple <- function(data, value_col, first_deriv, second_deriv, ...){
 }
 
 
-fl_class_cp <- function(data, value_col, first_deriv, second_deriv, ...){
+fl_class_cp <- function(data, value_col, first_deriv, ...){
   value_col <- rlang::enquo(value_col)
   first_deriv <- rlang::enquo(first_deriv)
-  second_deriv <- rlang::enquo(second_deriv)
   group_cols <- rlang::enquos(...)
 
   if (!rlang::is_empty(group_cols)) {

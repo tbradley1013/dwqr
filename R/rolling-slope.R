@@ -34,36 +34,30 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8, de
     data <- dplyr::group_by(data, !!!group_cols)
   }
 
-  data <- data %>%
-    dplyr::filter(!is.na(!!value_col),
-                  !is.na(!!date_col))
-
-
-  data <- data %>%
-    dplyr::mutate(
-      roll_mean = rolling_mean(!!value_col, !!date_col, rolling_window),
-      date_numeric = as.numeric(!!date_col)
-    ) %>%
-    dplyr::filter(!is.na(roll_mean))
-
-  if (length(group_cols) == 0){
-    data <- tidyr::nest(data, data = dplyr::everything())
-  } else {
-    data <- tidyr::nest(data)
-  }
 
   output <- data %>%
+    dplyr::filter(!is.na(!!value_col),
+                  !is.na(!!date_col)) %>%
     dplyr::mutate(
+      roll_mean = zoo::rollmean(!!value_col, rolling_window, fill = NA),
+      date_numeric = as.numeric(!!date_col)
+    ) %>%
+    dplyr::filter(!is.na(roll_mean)) %>%
+    tidyr::nest() %>%
+    dplyr::mutate(
+      spline = purrr::map(.data$data, ~smooth.spline(.x[[ !!date_name ]], .x[[ !!value_name ]])),
+      first_deriv = purrr::map2(.data$spline, .data$data, ~{
+        predict(.x, as.numeric(.y[[ !!date_name ]]), deriv = 1) %>%
+          tibble::as_tibble()
+      }),
       spline_ma = purrr::map(.data$data, ~smooth.spline(.x[[ !!date_name ]], .x$roll_mean)),
       first_deriv_ma = purrr::map2(.data$spline_ma, .data$data, ~{
         predict(.x, .y$date_numeric, deriv = 1) %>%
           tibble::as_tibble()
       }),
-      deriv_spline_ma = purrr::map2(.data$first_deriv_ma, .data$data, ~{
-        smooth.spline(.y[[ !!date_name ]], .x$y)
-      }),
-      second_deriv_ma = purrr::map2(.data$deriv_spline_ma, .data$data, ~{
-        predict(.x, .y$date_numeric, deriv = 1) %>%
+      second_deriv_ma = purrr::map2(.data$spline_ma, .data$data, ~{
+        predict(.x, .y$date_numeric, deriv = 2) %>%
+
           tibble::as_tibble()
       }),
       data = purrr::pmap(
@@ -73,19 +67,22 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8, de
           .data$second_deriv_ma
         ),
         .f = ~{
-          ..1 %>%
-            dplyr::left_join(..2, by = c("date_numeric" = "x")) %>%
-            dplyr::rename(first_deriv_ma = y) %>%
-            dplyr::left_join(..3, by = c("date_numeric" = "x")) %>%
-            dplyr::rename(second_deriv_ma = y)
+
+          out <- dplyr::bind_cols(
+            ..1,
+            dplyr::select(..2, first_deriv_ma = y),
+            dplyr::select(..3, second_deriv_ma = y)
+          )
+
+          return(out)
         }
       )
     ) %>%
-    dplyr::select(!!!group_cols, data) %>%
-    tidyr::unnest(data) %>%
+    dplyr::select(data_new) %>%
+    tidyr::unnest(data_new) %>%
     dplyr::mutate(
-      rolling_first = rolling_mean(first_deriv_ma, !!date_col, deriv_window),
-      rolling_second = rolling_mean(second_deriv_ma, !!date_col, deriv_window)
+      rolling_first = zoo::rollmean(first_deriv_ma, rolling_window, fill = NA),
+      rolling_second = zoo::rollmean(second_deriv_ma, rolling_window, fill = NA)
     )
 
   return(output)

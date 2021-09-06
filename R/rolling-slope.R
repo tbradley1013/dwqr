@@ -78,8 +78,8 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8, de
         }
       )
     ) %>%
-    dplyr::select(data_new) %>%
-    tidyr::unnest(data_new) %>%
+    dplyr::select(!!!group_cols, data) %>%
+    tidyr::unnest(data) %>%
     dplyr::mutate(
       rolling_first = zoo::rollmean(first_deriv_ma, rolling_window, fill = NA),
       rolling_second = zoo::rollmean(second_deriv_ma, rolling_window, fill = NA)

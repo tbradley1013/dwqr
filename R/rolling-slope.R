@@ -12,14 +12,10 @@
 #' needed - e.g. if the dataset contains multiple sites and/or parameters.
 #' @param rolling_window how large should the rolling mean window be? Specifies
 #' the number of weeks worth of data to include in rolling mean calculations
-#' @param deriv_window how many weeks of data should be included in the rolling
-#' average window for the derivatives. If NULL (default) the value given to
-#' rolling_window will be used. This argument will be ignored unless
-#' smooth_deriv = TRUE.
 #' @importFrom stats smooth.spline predict
 #'
 #' @export
-rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8, deriv_window = NULL){
+rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
   if (!"data.frame" %in% class(data)) stop("data must be a data.frame or a tibble")
 
   date_col <- rlang::enquo(date_col)

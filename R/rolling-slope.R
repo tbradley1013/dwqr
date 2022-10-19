@@ -24,7 +24,7 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
   value_name <- rlang::quo_name(value_col)
   group_cols <- rlang::enquos(...)
 
-  if (is.null(deriv_window)) deriv_window <- rolling_window
+  # if (is.null(deriv_window)) deriv_window <- rolling_window
 
   if (!rlang::is_empty(group_cols)) {
     data <- dplyr::group_by(data, !!!group_cols)

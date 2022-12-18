@@ -5,7 +5,9 @@
 \alias{dwqr_datasets}
 \alias{nitrification}
 \title{\strong{dwqr datasets}}
-\format{An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 536 rows and 4 columns.}
+\format{
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 536 rows and 4 columns.
+}
 \usage{
 nitrification
 }

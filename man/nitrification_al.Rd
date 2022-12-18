@@ -4,9 +4,18 @@
 \alias{nitrification_al}
 \title{determine action levels for nitrification}
 \usage{
-nitrification_al(data, date_col, value_col, ..., method = c("FL", "P"),
-  percentiles = c(0.8, 0.5, 0.1), rolling_window = 8,
-  max_chlorine = 1.5, output_name = c("AL-C", "AL", "P"))
+nitrification_al(
+  data,
+  date_col,
+  value_col,
+  ...,
+  method = c("simple", "hmm", "cp"),
+  percentiles = c(0.8, 0.5, 0.2),
+  rolling_window = 8,
+  ma = TRUE,
+  max_chlorine = 1.5,
+  output_name = c("AL-C", "AL", "P")
+)
 }
 \arguments{
 \item{data}{a data frame with chlorine residual results}
@@ -17,16 +26,19 @@ nitrification_al(data, date_col, value_col, ..., method = c("FL", "P"),
 
 \item{...}{unquoted column names of grouping variables}
 
-\item{method}{either "FL" (Falling Limb) or "P" (Percentiles)}
+\item{method}{one of "hmm" (hidden markov model), "cp" (changepoints), or
+"simple". See Details}
 
 \item{percentiles}{a vector of the percentiles that you would like calculated
 either on the overall data ("P" method) or on the falling limb portion of
 the dataset ("FL" method). By default, 0.8, 0.5, and 0.1 are used for action
 levels 1, 2, and 3, respectively}
 
-\item{rolling_window}{how many observations should be included in the rolling
+\item{rolling_window}{how many weeks of data should be included in the rolling
 average window function when calculating the first and second derivative of
 the chlorine time series. Defaults to 8.}
+
+\item{ma}{logical; should the moving average be used to determine smooth spline}
 
 \item{max_chlorine}{maximum chlorine residual value that can be included in
 falling limb. For example, if you are not concerned with sites when chlorine
@@ -37,7 +49,7 @@ will be classified as either "Falling Limb" or "Nitrification Ongoing"}
 action levels ("AL-C"), i.e. Action Level 1, Action Level 2, etc.,
 as action levels better suited for R code ("AL"), i.e. action_level_1, etc.,
 or as the percentile ("P"), i.e.
-80%, 50%, etc.}
+80\%, 50\%, etc.}
 }
 \description{
 \code{nitrification_al} calculates proposed action levels for chlorine
@@ -46,19 +58,22 @@ levels can be calculated via the falling limb method or by plain
 percentiles of the overall data
 }
 \details{
-There are two methods provided for calculating nitrification action levels:
+The method argument must be set to one of the following:
+\itemize{
+\item "simple" - A simple classification method that classifies any negative
+first derivative value as a part of the falling limb. Taking the first
+derivative of the moving average of the chlorine values is likely to reduce
+false classification rates when this model type is selected
+\item "hmm" - This method uses the depmixS4 package to fit a hidden markov model
+using the time trend of the first derivative of the total chlorine trend
+\item "cp" - This method uses the strucchange package to identify change points
+in the first derivative trned and classify values based on median first derivative
+values between change points
+}
 
-FL - \emph{Falling Limb} - This method uses the falling limb method to identify
-the downward trend experienced by chlorine values as temperatures rise. Before
-percentiles are caluclated, the falling limb portion of the graph is isolated
-and only this portion is used in the percentile calculations
-
-P - \emph{Percentiles} - This method simply takes the percentiles given on the
-entire dataset to find the action levels.
-
-By default, there are three percentiles calculated (80%, 50%, 10%) corresponding
-to three distinct action levels (80% - Action Level 1, 50% - Action Level 2,
-10% - Action Level 3). If more or less action levels are desired, then simply
+By default, there are three percentiles calculated (80\%, 50\%, 10\%) corresponding
+to three distinct action levels (80\% - Action Level 1, 50\% - Action Level 2,
+10\% - Action Level 3). If more or less action levels are desired, then simply
 specify more or less values in the \strong{percentiles} argument.
 
 The output tibble will contain columns for each of the specified columns along

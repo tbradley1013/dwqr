@@ -4,11 +4,19 @@
 \alias{falling_limb}
 \title{classify the falling limb of chlorine trend}
 \usage{
-falling_limb(data, value_col, first_deriv, second_deriv, ...,
-  max_chlorine = 1.5)
+falling_limb(
+  data,
+  method = c("simple", "hmm", "cp"),
+  value_col,
+  first_deriv,
+  ...
+)
 }
 \arguments{
 \item{data}{a data frame with chlorine residual results}
+
+\item{method}{the method used to classify the falling limb of the chlorine
+curve. See Details.}
 
 \item{value_col}{unqouted column name of column containing the chlorine
 results for the time series}
@@ -16,18 +24,24 @@ results for the time series}
 \item{first_deriv}{unquoted column name of column containing first derivative
 of chlorine time series}
 
-\item{second_deriv}{unquoted column name of column containing second
-derivative of chlorine time series}
-
 \item{...}{unqouted column names of any grouping columns}
-
-\item{max_chlorine}{maximum chlorine residual value that can be included in
-falling limb. For example, if you are not concerned with sites when chlorine
-is greater than 1.5 (default) than no value greater than this threshold
-will be classified as either "Falling Limb" or "Nitrification Ongoing"}
 }
 \description{
 \code{falling_limb} use the first and second derivative of a
 time series slope to classify portions of it as the falling limb
 of the curve
+}
+\details{
+the method argument must be set to one of the following:
+\itemize{
+\item "simple" - A simple classification method that classifies any negative
+first derivative value as a part of the falling limb. Taking the first
+derivative of the moving average of the chlorine values is likely to reduce
+false classification rates when this model type is selected
+\item "hmm" - This method uses the depmixS4 package to fit a hidden markov model
+using the time trend of the first derivative of the total chlorine trend
+\item "cp" - This method uses the strucchange package to identify change points
+in the first derivative trned and classify values based on median first derivative
+values between changepoints
+}
 }

@@ -4,7 +4,14 @@
 \alias{rolling_slope}
 \title{Calculate first and second derivative of chlorine trend}
 \usage{
-rolling_slope(data, date_col, value_col, ..., rolling_window = 8)
+rolling_slope(
+  data,
+  date_col,
+  value_col,
+  ...,
+  rolling_window = 8,
+  return_models = FALSE
+)
 }
 \arguments{
 \item{data}{a dataframe or tbl that contains at the minimum a date column
@@ -17,7 +24,8 @@ and a chlorine residual column}
 \item{...}{the unqouted names of all grouping columns, if grouping is
 needed - e.g. if the dataset contains multiple sites and/or parameters.}
 
-\item{rolling_window}{how large should the rolling mean window be?}
+\item{rolling_window}{how large should the rolling mean window be? Specifies
+the number of weeks worth of data to include in rolling mean calculations}
 }
 \description{
 \code{rolling_slope} calculates the first and second derivative

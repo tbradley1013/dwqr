@@ -6,7 +6,6 @@
 \alias{dwqr-package}
 \title{dwqr: **D**rinking **W**ater **Q**uality **R**}
 \description{
-This package allows for calculation of different statistics 
-    for drinking water quality in drinking water distribution systems.
+This package allows for calculation of different statistics for drinking water quality in drinking water distribution systems.
 }
 \keyword{internal}

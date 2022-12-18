@@ -4,13 +4,30 @@
 \alias{plot_fl}
 \title{Plot falling limb functions}
 \usage{
-plot_fl(data, date_col, value_col, ..., rolling_window = 8,
-  max_chlorine = 1.5, date_breaks = "6 months",
-  date_labels = "\%b \%d, \%Y", ylab = "", ylim = NULL,
-  plot_title = "", plot_subtitle = "", include_first = FALSE,
-  first_ylim = NULL, theme = NULL, nitrite_col,
-  nitrite_ylab = "Nitrite", nitrite_ylim = NULL, ncol = NULL,
-  nrow = NULL)
+plot_fl(
+  data,
+  date_col,
+  value_col,
+  ...,
+  rolling_window = 8,
+  max_chlorine = 1.5,
+  smooth_deriv = FALSE,
+  deriv_window = NULL,
+  date_breaks = "6 months",
+  date_labels = "\%b \%d, \%Y",
+  ylab = "",
+  ylim = NULL,
+  plot_title = "",
+  plot_subtitle = "",
+  include_first = FALSE,
+  first_ylim = NULL,
+  theme = NULL,
+  nitrite_col,
+  nitrite_ylab = "Nitrite",
+  nitrite_ylim = NULL,
+  ncol = NULL,
+  nrow = NULL
+)
 }
 \arguments{
 \item{data}{a data frame containing chlorine residual results}
@@ -21,7 +38,7 @@ plot_fl(data, date_col, value_col, ..., rolling_window = 8,
 
 \item{...}{unqouted column name(s) of grouping variable(s)}
 
-\item{rolling_window}{how many observations should be included in the rolling
+\item{rolling_window}{how many weeks of data should be included in the rolling
 average window function when calculating the first and second derivative of
 the chlorine time series. Defaults to 8.}
 

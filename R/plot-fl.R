@@ -109,15 +109,15 @@ plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
   if (include_first) {
     p2 <- plot_data %>%
       ggplot2::ggplot(ggplot2::aes(!!date_col)) +
-      ggplot2::geom_point(ggplot2::aes(y = first_deriv_ma, color = "black")) +
-      ggplot2::geom_line(ggplot2::aes(y = rolling_first, color = "red"), size = 1) +
+      ggplot2::geom_point(ggplot2::aes(y = first_deri, color = "black")) +
+      ggplot2::geom_line(ggplot2::aes(y = first_deriv_ma, color = "red"), size = 1) +
       ggplot2::geom_hline(ggplot2::aes(yintercept = 0), color = "black", linetype = "dashed") +
       ggplot2::theme_bw() +
       ggplot2::scale_color_manual(
         values = c("black" = "black", "red" = "red"),
         labels = c(
           "First Derivative",
-          "Rolling Average of First Derivative"
+          "First Derivative of Moving Average"
         )
       ) +
       ggplot2::theme(

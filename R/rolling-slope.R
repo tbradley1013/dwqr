@@ -15,7 +15,7 @@
 #' @importFrom stats smooth.spline predict
 #'
 #' @export
-rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
+rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8, return_models = FALSE){
   if (!"data.frame" %in% class(data)) stop("data must be a data.frame or a tibble")
 
   date_col <- rlang::enquo(date_col)
@@ -51,35 +51,35 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8){
         predict(.x, .y$date_numeric, deriv = 1) %>%
           tibble::as_tibble()
       }),
-      second_deriv_ma = purrr::map2(.data$spline_ma, .data$data, ~{
-        predict(.x, .y$date_numeric, deriv = 2) %>%
-
-          tibble::as_tibble()
-      }),
+      # second_deriv_ma = purrr::map2(.data$spline_ma, .data$data, ~{
+      #   predict(.x, .y$date_numeric, deriv = 2) %>%
+      #
+      #     tibble::as_tibble()
+      # }),
       data = purrr::pmap(
         .l = list(
           .data$data,
-          .data$first_deriv_ma,
-          .data$second_deriv_ma
+          .data$first_deriv_ma
+          # .data$second_deriv_ma
         ),
         .f = ~{
 
           out <- dplyr::bind_cols(
             ..1,
-            dplyr::select(..2, first_deriv_ma = y),
-            dplyr::select(..3, second_deriv_ma = y)
+            dplyr::select(..2, first_deriv_ma = y)
+            # dplyr::select(..3, second_deriv_ma = y)
           )
 
           return(out)
         }
       )
-    ) %>%
-    dplyr::select(!!!group_cols, data) %>%
-    tidyr::unnest(data) %>%
-    dplyr::mutate(
-      rolling_first = zoo::rollmean(first_deriv_ma, rolling_window, fill = NA),
-      rolling_second = zoo::rollmean(second_deriv_ma, rolling_window, fill = NA)
     )
+
+  if (return_models) return(output)
+
+  output <- output %>%
+    dplyr::select(!!!group_cols, data) %>%
+    tidyr::unnest(data)
 
   return(output)
 

@@ -59,6 +59,7 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8, re
       data = purrr::pmap(
         .l = list(
           .data$data,
+          .data$first_deriv,
           .data$first_deriv_ma
           # .data$second_deriv_ma
         ),
@@ -66,7 +67,8 @@ rolling_slope <- function(data, date_col, value_col, ..., rolling_window = 8, re
 
           out <- dplyr::bind_cols(
             ..1,
-            dplyr::select(..2, first_deriv_ma = y)
+            dplyr::select(..2, first_deriv = y),
+            dplyr::select(..3, first_deriv_ma = y)
             # dplyr::select(..3, second_deriv_ma = y)
           )
 

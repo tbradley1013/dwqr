@@ -9,7 +9,7 @@ falling_limb(
   method = c("simple", "hmm", "cp"),
   value_col,
   first_deriv,
-  ...
+  group_col
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ results for the time series}
 \item{first_deriv}{unquoted column name of column containing first derivative
 of chlorine time series}
 
-\item{...}{unqouted column names of any grouping columns}
+\item{group_col}{vector of unqouted column names of any grouping columns}
 }
 \description{
 \code{falling_limb} use the first and second derivative of a

@@ -24,7 +24,10 @@ Imports:
     patchwork,
     depmixS4,
     strucchange,
-    zoo
+    zoo,
+    mgcv,
+    gratia,
+    DAMisc
 Remotes: 
     github::thomasp85/patchwork
 Suggests:

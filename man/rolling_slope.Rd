@@ -8,8 +8,8 @@ rolling_slope(
   data,
   date_col,
   value_col,
-  ...,
-  rolling_window = 8,
+  group_col = NULL,
+  model = c("ss", "gam", "loess"),
   return_models = FALSE
 )
 }
@@ -21,11 +21,12 @@ and a chlorine residual column}
 
 \item{value_col}{the unquoted name of the chlorine residual column}
 
-\item{...}{the unqouted names of all grouping columns, if grouping is
+\item{group_col}{vector of unqouted names of all grouping columns, if grouping is
 needed - e.g. if the dataset contains multiple sites and/or parameters.}
 
-\item{rolling_window}{how large should the rolling mean window be? Specifies
-the number of weeks worth of data to include in rolling mean calculations}
+\item{model}{the model type to use to estimate total chlorine trend. One of
+"ss" (smooth spline), "gam" (generalized additive model), or "loess"
+(Local Polynomial Regression)}
 }
 \description{
 \code{rolling_slope} calculates the first and second derivative

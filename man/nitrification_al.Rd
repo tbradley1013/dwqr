@@ -8,11 +8,10 @@ nitrification_al(
   data,
   date_col,
   value_col,
-  ...,
+  group_col = NULL,
+  model = c("ss", "gam", "loess"),
   method = c("simple", "hmm", "cp"),
   percentiles = c(0.8, 0.5, 0.2),
-  rolling_window = 8,
-  ma = TRUE,
   max_chlorine = 1.5,
   output_name = c("AL-C", "AL", "P")
 )
@@ -24,7 +23,11 @@ nitrification_al(
 
 \item{value_col}{the unquoted column name of the results in data}
 
-\item{...}{unquoted column names of grouping variables}
+\item{group_col}{vector of unquoted column names of grouping variables}
+
+\item{model}{the model type to use to estimate total chlorine trend. One of
+"ss" (smooth spline), "gam" (generalized additive model), or "loess"
+(Local Polynomial Regression)}
 
 \item{method}{one of "hmm" (hidden markov model), "cp" (changepoints), or
 "simple". See Details}
@@ -33,12 +36,6 @@ nitrification_al(
 either on the overall data ("P" method) or on the falling limb portion of
 the dataset ("FL" method). By default, 0.8, 0.5, and 0.1 are used for action
 levels 1, 2, and 3, respectively}
-
-\item{rolling_window}{how many weeks of data should be included in the rolling
-average window function when calculating the first and second derivative of
-the chlorine time series. Defaults to 8.}
-
-\item{ma}{logical; should the moving average be used to determine smooth spline}
 
 \item{max_chlorine}{maximum chlorine residual value that can be included in
 falling limb. For example, if you are not concerned with sites when chlorine

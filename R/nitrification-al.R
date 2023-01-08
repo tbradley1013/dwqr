@@ -8,17 +8,16 @@
 #' @param data a data frame with chlorine residual results
 #' @param date_col the unquoted column name of a date or datetime column in data
 #' @param value_col the unquoted column name of the results in data
-#' @param ... unquoted column names of grouping variables
+#' @param group_col vector of unquoted column names of grouping variables
 #' @param method one of "hmm" (hidden markov model), "cp" (changepoints), or
 #' "simple". See Details
 #' @param percentiles a vector of the percentiles that you would like calculated
 #' either on the overall data ("P" method) or on the falling limb portion of
 #' the dataset ("FL" method). By default, 0.8, 0.5, and 0.1 are used for action
 #' levels 1, 2, and 3, respectively
-#' @param rolling_window how many weeks of data should be included in the rolling
-#' average window function when calculating the first and second derivative of
-#' the chlorine time series. Defaults to 8.
-#' @param ma logical; should the moving average be used to determine smooth spline
+#' @param model the model type to use to estimate total chlorine trend. One of
+#' "ss" (smooth spline), "gam" (generalized additive model), or "loess"
+#' (Local Polynomial Regression)
 #' @param max_chlorine maximum chlorine residual value that can be included in
 #' falling limb. For example, if you are not concerned with sites when chlorine
 #' is greater than 1.5 (default) than no value greater than this threshold
@@ -57,9 +56,10 @@
 #'
 #'
 #' @export
-nitrification_al <- function(data, date_col, value_col, ..., method = c("simple", "hmm", "cp"),
-                             percentiles = c(.8, .5, .2), rolling_window = 8, ma = TRUE,
-
+nitrification_al <- function(data, date_col, value_col, group_col = NULL,
+                             model = c("ss", "gam", "loess"),
+                             method = c("simple", "hmm", "cp"),
+                             percentiles = c(.8, .5, .2),
                              max_chlorine = 1.5, output_name = c("AL-C", "AL", "P")){
   if (!"data.frame" %in% class(data)) stop("data must be of class data.frame or tbl", call. = FALSE)
   req_cols <- c(missing(date_col), missing(value_col))
@@ -69,9 +69,9 @@ nitrification_al <- function(data, date_col, value_col, ..., method = c("simple"
   method <- match.arg(method, c("simple", "hmm", "cp"))
   output_name <- match.arg(output_name, c("AL-C", "AL", "P"))
 
-  value_col <- rlang::enquo(value_col)
-  date_col <- rlang::enquo(date_col)
-  group_cols <- rlang::enquos(...)
+  # value_col <- rlang::enquo(value_col)
+  # date_col <- rlang::enquo(date_col)
+  # group_cols <- rlang::enquos(...)
 
   percentiles <- sort(percentiles, decreasing = TRUE)
 
@@ -91,26 +91,17 @@ nitrification_al <- function(data, date_col, value_col, ..., method = c("simple"
   }) %>%
     purrr::set_names(nm = quant_names)
 
-  if (ma){
-    data_classed <- data %>%
-      rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
-      falling_limb(!!value_col, method = method, first_deriv_ma, ...)
-  } else {
-    data_classed <- data %>%
-      rolling_slope(!!date_col, !!value_col, ..., rolling_window = rolling_window) %>%
-      falling_limb(!!value_col, method = method, first_deriv, ...)
-  }
+  data_classed <- data %>%
+    rolling_slope({{date_col}}, {{value_col}}, {{group_col}}, model = model) %>%
+    falling_limb({{value_col}}, method = method, first_deriv, {{group_col}})
 
 
 
-  if (!rlang::is_empty(group_cols)) {
-    data_classed <- dplyr::group_by(data_classed, !!!group_cols)
-
-  }
+  data_classed <- dplyr::group_by(data_classed, dplyr::across({{group_col}}))
 
   output <- data_classed %>%
-    dplyr::filter(falling_limb == "Falling Limb", !!value_col < max_chlorine) %>%
-    dplyr::summarize_at(dplyr::vars(!!value_col), quants)
+    dplyr::filter(falling_limb == "Falling Limb", {{value_col}} < max_chlorine) %>%
+    dplyr::summarize_at(dplyr::vars({{value_col}}), quants)
 
   return(output)
 }

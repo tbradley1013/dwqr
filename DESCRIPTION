@@ -1,7 +1,7 @@
 Package: dwqr
 Type: Package
 Title: **D**rinking **W**ater **Q**uality **R**
-Version: 0.1.1
+Version: 0.1.2
 Author@R: person("Tyler", "Bradley", "tyler.bradley@phila.gov", role = c("aut", "cre")) 
 Description: This package allows for calculation of different statistics 
     for drinking water quality in drinking water distribution systems.

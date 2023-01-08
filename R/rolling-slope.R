@@ -49,7 +49,8 @@ rolling_slope <- function(data, date_col, value_col, group_col = NULL,
         spline = purrr::map(.data$data, ~smooth.spline(.x[[ date_name ]], .x[[ value_name ]])),
         first_deriv = purrr::map2(.data$spline, .data$data, ~{
           predict(.x, as.numeric(.y[[ date_name ]]), deriv = 1) %>%
-            tibble::as_tibble()
+            tibble::as_tibble() %>%
+            dplyr::pull(y)
         })
       )
   } else if (model == "gam") {
@@ -60,7 +61,7 @@ rolling_slope <- function(data, date_col, value_col, group_col = NULL,
         }),
         first_deriv = purrr::map2(gam_model, data, ~{
           gratia::derivatives(.x, term = "s(date_numeric)", type = "central", n = nrow(.y), eps = 1e-5) %>%
-            dplyr::select(first_deriv_gam = derivative)
+            dplyr::pull(derivative)
 
         })
       )
@@ -76,30 +77,30 @@ rolling_slope <- function(data, date_col, value_col, group_col = NULL,
       )
   }
 
-  output <- output %>%
-    dplyr::mutate(
-      data = purrr::pmap(
-        .l = list(
-          .data$data,
-          .data$first_deriv
-        ),
-        .f = ~{
-
-          out <- dplyr::bind_cols(
-            ..1,
-            dplyr::select(..2, first_deriv = y)
-          )
-
-          return(out)
-        }
-      )
-    )
+  # output <- output %>%
+  #   dplyr::mutate(
+  #     data = purrr::pmap(
+  #       .l = list(
+  #         .data$data,
+  #         .data$first_deriv
+  #       ),
+  #       .f = ~{
+  #
+  #         out <- dplyr::bind_cols(
+  #           ..1,
+  #           dplyr::select(..2, first_deriv = y)
+  #         )
+  #
+  #         return(out)
+  #       }
+  #     )
+  #   )
 
   if (return_models) return(output)
 
   output <- output %>%
-    dplyr::select({{group_col}}, data) %>%
-    tidyr::unnest(data)
+    dplyr::select({{group_col}}, data, first_deriv) %>%
+    tidyr::unnest(c(data, first_deriv))
 
 
   return(output)

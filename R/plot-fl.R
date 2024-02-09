@@ -41,9 +41,6 @@
 #' nitrite plot. If NULL (default) default ggplot2 limits will be used
 #' @param ncol,nrow If grouping variable is specified, these arguments set the
 #' number of columns and rows, respectively of the resultant facetted plot
-#'
-#'
-#' @export
 plot_fl <- function(data, date_col, value_col, ..., rolling_window = 8,
                     max_chlorine = 1.5, smooth_deriv = FALSE, deriv_window = NULL,
                     date_breaks = "6 months", date_labels = "%b %d, %Y",

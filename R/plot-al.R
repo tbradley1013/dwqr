@@ -35,8 +35,6 @@
 #' levels in the resulting data will be equal to the number of action levels given
 #' @param ncol,nrow If grouping variable is specified, these arguments set the
 #' number of columns and rows, respectively of the resultant faceted plot
-#'
-#' @export
 plot_al <- function(data, date_col, value_col, ..., method = c("FL", "P"),
                     percentiles = c(.8, .5, .1), rolling_window = 8,
                     smooth_deriv = FALSE, deriv_window = NULL,

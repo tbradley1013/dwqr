@@ -19,7 +19,7 @@
 rolling_slope <- function(data, date_col, value_col, group_col = NULL,
                           model = c("ss", "gam", "loess"), return_models = FALSE){
   if (!"data.frame" %in% class(data)) stop("data must be a data.frame or a tibble")
-
+  # browser()
   # date_col <- rlang::enquo(date_col)
   date_name <- rlang::as_string(rlang::ensym(date_col))
   # value_col <- rlang::enquo(value_col)
@@ -55,9 +55,9 @@ rolling_slope <- function(data, date_col, value_col, group_col = NULL,
       )
   } else if (model == "gam") {
     output <- data_nest %>%
-      mutate(
+      dplyr::mutate(
         gam_model = purrr::map(data, ~{
-          mgcv::gam(chlorine_residual_total ~ s(date_numeric, bs = "cr", m=2, k = 64), data = .x)
+          mgcv::gam(.x[[ value_name ]] ~ s(date_numeric, bs = "cr", m=2, k = 64), data = .x)
         }),
         first_deriv = purrr::map2(gam_model, data, ~{
           gratia::derivatives(.x, term = "s(date_numeric)", type = "central", n = nrow(.y), eps = 1e-5) %>%
@@ -67,9 +67,9 @@ rolling_slope <- function(data, date_col, value_col, group_col = NULL,
       )
   } else if (model == "loess") {
     output <- data_nest %>%
-      mutate(
+      dplyr::mutate(
         loess_model = purrr::map(data, ~{
-          loess(chlorine_residual_total ~ date_numeric, data = .x, span = .15)
+          loess(.x[[ value_name ]] ~ date_numeric, data = .x, span = .15)
         }),
         first_deriv = purrr::map(loess_model, ~{
           DAMisc::loessDeriv(.x)
